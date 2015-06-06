@@ -14,26 +14,29 @@ Drawer = function(context) {
   }
 
   function drawVerticalLines() {
-    for (var currentColumn = 0; currentColumn <= NUM_COLUMNS; currentColumn++)
-      drawVerticalLine(currentColumn);
+    for (var curColumn = 0; curColumn <= NUM_COLUMNS; curColumn++)
+      drawVerticalLine(TILE_WIDTH * curColumn);
   }
 
-  function drawVerticalLine(currentColumn) {
-    var x = TILE_WIDTH * currentColumn;
+  function drawVerticalLine(x) {
     context.moveTo(x, 0);
-    for (var currentRow = 0; currentRow <= NUM_ROWS; currentRow++)
-      context.lineTo(x, TILE_HEIGHT * currentRow);
+    for (var curWall = 0; curWall <= NUM_ROWS; curWall++) {
+      var y = TILE_HEIGHT * curWall;
+      context.lineTo(x, y);
+    }
   }
 
   function drawHorizontalLines() {
-    for (var i = 0; i <= NUM_ROWS; i++)
-      drawHorizontalLine(i);
+    for (var curRow = 0; curRow <= NUM_ROWS; curRow++)
+      drawHorizontalLine(TILE_WIDTH * curRow);
   }
 
-  function drawHorizontalLine(i) {
-    context.moveTo(0, TILE_WIDTH * i);
-    for (var j = 0; j <= NUM_COLUMNS; j++)
-      context.lineTo(TILE_WIDTH * j, TILE_WIDTH * i);
+  function drawHorizontalLine(y) {
+    context.moveTo(0, y);
+    for (var curWall = 0; curWall <= NUM_COLUMNS; curWall++) {
+      var x = TILE_WIDTH * curWall;
+      context.lineTo(x, y);
+    }
   }
 }
 
