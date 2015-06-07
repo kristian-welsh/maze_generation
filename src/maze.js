@@ -14,8 +14,16 @@ Drawer = function(context) {
   }
 
   function drawVerticalLines() {
-    for (var curColumn = 0; curColumn <= NUM_COLUMNS; curColumn++)
-      drawVerticalLine(TILE_WIDTH * curColumn);
+    drawMultipleLines(drawVerticalLine, NUM_COLUMNS, TILE_HEIGHT);
+  }
+
+  function drawHorizontalLines() {
+    drawMultipleLines(drawHorizontalLine, NUM_ROWS, TILE_WIDTH);
+  }
+  
+  function drawMultipleLines(lineDrawingFunction, numLines, offset) {
+    for (var curLine = 0; curLine <= numLines; curLine++)
+      lineDrawingFunction(offset * curLine);
   }
 
   function drawVerticalLine(x) {
@@ -24,11 +32,6 @@ Drawer = function(context) {
       var y = TILE_HEIGHT * curWall;
       context.lineTo(x, y);
     }
-  }
-
-  function drawHorizontalLines() {
-    for (var curRow = 0; curRow <= NUM_ROWS; curRow++)
-      drawHorizontalLine(TILE_WIDTH * curRow);
   }
 
   function drawHorizontalLine(y) {
