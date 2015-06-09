@@ -5,8 +5,56 @@ NUM_COLUMNS = 10;
 TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
 TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
 
-Drawer = function(context) {
+LineDrawer = function(context) {
+  this.draw = function(xx, yy, numWalls, isVertical, offset) {
+    context.moveTo(xx, yy);
+    var func = function(curCall) {
+      drawWall(xx, yy, offset * curCall, isVertical)
+    }
+    times(numWalls, func);
+  }
 
+  function drawWall(xx, yy, newVal, isVertical) {
+    (isVertical) ? yy = newVal : xx = newVal;
+    context.lineTo(xx, yy);
+  }
+}
+
+VerticalDrawer = function(context) {
+  var lineDrawer = new LineDrawer(context);
+  
+  this.draw = function() {
+    drawMultipleLines(NUM_ROWS + 1, TILE_WIDTH);
+  }
+
+  function drawMultipleLines(numLines, offset) {
+    for (var curLine = 0; curLine < numLines; curLine++)
+      drawLine(offset * curLine);
+  }
+
+  function drawLine(startingX) {
+    lineDrawer.draw(startingX, 0, NUM_ROWS + 1, true, TILE_HEIGHT);
+  }
+}
+
+HorizontalDrawer = function(context) {
+  var lineDrawer = new LineDrawer(context);
+  
+  this.draw = function() {
+    drawMultipleLines(NUM_COLUMNS + 1, TILE_HEIGHT);
+  }
+
+  function drawMultipleLines(numLines, offset) {
+    for (var curLine = 0; curLine < numLines; curLine++)
+      drawLine(offset * curLine);
+  }
+
+  function drawLine(startingY) {
+    lineDrawer.draw(0, startingY, NUM_COLUMNS + 1, false, TILE_WIDTH);
+  }
+}
+
+Drawer = function(context) {
   this.drawGrid = function() {
     drawVerticalLines();
     drawHorizontalLines();
@@ -14,58 +62,17 @@ Drawer = function(context) {
   }
 
   function drawVerticalLines() {
-    drawMultipleLines(drawVerticalLine, NUM_COLUMNS + 1, TILE_HEIGHT);
+    new VerticalDrawer(context).draw();
   }
 
   function drawHorizontalLines() {
-    drawMultipleLines(drawHorizontalLine, NUM_ROWS + 1, TILE_WIDTH);
+    new HorizontalDrawer(context).draw();
   }
+}
 
-  function drawMultipleLines(lineDrawingFunction, numLines, offset) {
-    for (var curLine = 0; curLine < numLines; curLine++)
-      lineDrawingFunction(offset * curLine);
-  }
-
-  function drawVerticalLine(x) {
-    drawVLine(x, 0, TILE_HEIGHT);
-  }
-
-  function drawHorizontalLine(y) {
-    drawHLine(0, y, TILE_WIDTH);
-  }
-
-  function drawVLine(xx, yy, offset) {
-    generalWallDrawing(xx, yy, NUM_ROWS + 1, drawVWall, offset);
-  }
-
-  function drawHLine(xx, yy, offset) {
-    generalWallDrawing(xx, yy, NUM_COLUMNS + 1, drawHWall, offset);
-  }
-
-  function drawVWall(curCall, offset, xx, yy) {
-    alert("y: ".concat(yy, ", x: ", xx, ", val: ", offset * curCall));
-    yy = offset * curCall;
-    context.lineTo(xx, yy);
-  }
-
-  function drawHWall(curCall, offset, xx, yy) {
-    xx = offset * curCall;
-    context.lineTo(xx, yy);
-  }
-
-  function generalWallDrawing(xx, yy, numWalls, wallDrawer, offset) {
-    context.moveTo(xx, yy);
-    var func = function(curCall) {
-      wallDrawer(curCall, offset, xx, yy);
-    }
-    times(numWalls, func);
-  }
-
-  function times(numCalls, func) {
-    for (var curCall = 0; curCall < numCalls; curCall++)
-      func(curCall);
-  }
-
+function times(numCalls, func) {
+  for (var curCall = 0; curCall < numCalls; curCall++)
+    func(curCall);
 }
 
 Point = function(x, y) {
