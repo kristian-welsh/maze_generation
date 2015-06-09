@@ -14,32 +14,56 @@ Drawer = function(context) {
   }
 
   function drawVerticalLines() {
-    drawMultipleLines(drawVerticalLine, NUM_COLUMNS, TILE_HEIGHT);
+    drawMultipleLines(drawVerticalLine, NUM_COLUMNS + 1, TILE_HEIGHT);
   }
 
   function drawHorizontalLines() {
-    drawMultipleLines(drawHorizontalLine, NUM_ROWS, TILE_WIDTH);
+    drawMultipleLines(drawHorizontalLine, NUM_ROWS + 1, TILE_WIDTH);
   }
-  
+
   function drawMultipleLines(lineDrawingFunction, numLines, offset) {
-    for (var curLine = 0; curLine <= numLines; curLine++)
+    for (var curLine = 0; curLine < numLines; curLine++)
       lineDrawingFunction(offset * curLine);
   }
 
   function drawVerticalLine(x) {
-    context.moveTo(x, 0);
-    for (var curWall = 0; curWall <= NUM_ROWS; curWall++) {
-      var y = TILE_HEIGHT * curWall;
-      context.lineTo(x, y);
-    }
+    drawVLine(x, 0, TILE_HEIGHT);
   }
 
   function drawHorizontalLine(y) {
-    context.moveTo(0, y);
-    for (var curWall = 0; curWall <= NUM_COLUMNS; curWall++) {
-      var x = TILE_WIDTH * curWall;
-      context.lineTo(x, y);
+    drawHLine(0, y, TILE_WIDTH);
+  }
+
+  function drawVLine(xx, yy, offset) {
+    generalWallDrawing(xx, yy, NUM_ROWS + 1, drawVWall, offset);
+  }
+
+  function drawHLine(xx, yy, offset) {
+    generalWallDrawing(xx, yy, NUM_COLUMNS + 1, drawHWall, offset);
+  }
+
+  function drawVWall(curCall, offset, xx, yy) {
+    alert("y: ".concat(yy, ", x: ", xx, ", val: ", offset * curCall));
+    yy = offset * curCall;
+    context.lineTo(xx, yy);
+  }
+
+  function drawHWall(curCall, offset, xx, yy) {
+    xx = offset * curCall;
+    context.lineTo(xx, yy);
+  }
+
+  function generalWallDrawing(xx, yy, numWalls, wallDrawer, offset) {
+    context.moveTo(xx, yy);
+    var func = function(curCall) {
+      wallDrawer(curCall, offset, xx, yy);
     }
+    times(numWalls, func);
+  }
+
+  function times(numCalls, func) {
+    for (var curCall = 0; curCall < numCalls; curCall++)
+      func(curCall);
   }
 
 }
