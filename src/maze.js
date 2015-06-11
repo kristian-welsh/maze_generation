@@ -38,16 +38,17 @@ Drawer = function(context) {
       context.lineTo(x, y);
     }
   }
+
 }
 
 Point = function(x, y) {
   var x = x;
   var y = y;
-  
+
   function getX() {
     return x;
   }
-  
+
   function getY() {
     return y;
   }
@@ -55,12 +56,13 @@ Point = function(x, y) {
   this.toString = function() {
     return "Point ".concat("x: ", x, ", y: ", y);
   }
+
 }
 
 MazeCreator = function() {
   var maze = [];
   var startingPoint;
-  
+
   this.create = function() {
     createColumnArrays();
     createStartingPoint();
@@ -76,28 +78,34 @@ MazeCreator = function() {
   function createStartingPoint() {
     startingPoint = new Point(4, 9);
   }
+
 }
 
-doIt();
+Main = function() {
 
-function doIt() {
-  var context = retrieveCanvasContext();
-  fillBackground(context);
-  var maze = createMaze();
-  alert(maze);
-  new Drawer(context).drawGrid();
+  this.doIt = function() {
+    var context = retrieveCanvasContext();
+    fillBackground(context);
+    var maze = createMaze();
+    alert(maze);
+    new Drawer(context).drawGrid();
+  }
+
+  function createMaze() {
+    return new MazeCreator().create();
+  }
+
+  function retrieveCanvasContext() {
+    var canvas = document.getElementById("myCanvas");
+    return canvas.getContext("2d");
+  }
+
+  function fillBackground(context) {
+    context.fillStyle = "#DDDDDD";
+    context.fillRect(0, 0, 400, 400);
+  }
+
 }
 
-function createMaze() {
-  return new MazeCreator().create();
-}
+new Main().doIt();
 
-function retrieveCanvasContext() {
-  var canvas = document.getElementById("myCanvas");
-  return canvas.getContext("2d");
-}
-
-function fillBackground(context) {
-  context.fillStyle = "#DDDDDD";
-  context.fillRect(0, 0, 400, 400);
-}
