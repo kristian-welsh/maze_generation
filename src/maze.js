@@ -40,12 +40,56 @@ Drawer = function(context) {
   }
 }
 
+Point = function(x, y) {
+  var x = x;
+  var y = y;
+  
+  function getX() {
+    return x;
+  }
+  
+  function getY() {
+    return y;
+  }
+
+  this.toString = function() {
+    return "Point ".concat("x: ", x, ", y: ", y);
+  }
+}
+
+MazeCreator = function() {
+  var maze = [];
+  var startingPoint;
+  
+  this.create = function() {
+    createColumnArrays();
+    createStartingPoint();
+    alert(startingPoint.toString());
+    return maze;
+  }
+
+  function createColumnArrays() {
+    for(var i = 0; i < NUM_COLUMNS; i++)
+        maze.push([]);
+  }
+
+  function createStartingPoint() {
+    startingPoint = new Point(4, 9);
+  }
+}
+
 doIt();
 
 function doIt() {
   var context = retrieveCanvasContext();
   fillBackground(context);
+  var maze = createMaze();
+  alert(maze);
   new Drawer(context).drawGrid();
+}
+
+function createMaze() {
+  return new MazeCreator().create();
 }
 
 function retrieveCanvasContext() {
