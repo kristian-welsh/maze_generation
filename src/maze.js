@@ -142,9 +142,13 @@ Main = function() {
 }
 
 Tests = function() {
+  var results = [];
+  var errors = [];
+
   this.runTests = function() {
-    testMazeCreation();
-    testPoint();
+    run(testMazeCreation);
+    run(testPoint);
+    printResults();
   }
 
   function testMazeCreation() {
@@ -169,6 +173,30 @@ Tests = function() {
 
   function fail(message) {
     throw new Error(message);
+  }
+  
+  function run(test) {
+    try {
+      test();
+      logPass();
+    } catch(error) {
+      logFailure(error);
+    }
+  }
+
+  function logPass() {
+    results.push(".");
+  }
+
+  function logFailure(error) {
+    results.push("F");
+    errors.push(error);
+  }
+
+  function printResults() {
+    console.log(results.join(" "));
+    for(var i = 0; i < errors.length; i++)
+      console.log(errors[i]);
   }
 
 }
