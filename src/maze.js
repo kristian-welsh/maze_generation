@@ -93,24 +93,58 @@ Point = function(x, y) {
 
 }
 
+// 0 = unvisited
+// 1 = visited
+// 2 = dead end
 MazeCreator = function() {
   var maze = [];
   var startingPoint;
 
   this.create = function() {
-    createColumnArrays();
+    createRowArrays();
+    makeAllMazeUnvisited();
     createStartingPoint();
-    alert(startingPoint.toString());
+    generate();
+    alert(toString());
     return maze;
   }
 
-  function createColumnArrays() {
-    for(var i = 0; i < NUM_COLUMNS; i++)
+  function createRowArrays() {
+    for(var i = 0; i < NUM_ROWS; i++)
         maze.push([]);
+  }
+
+  function makeAllMazeUnvisited() {
+    for(var i = 0; i < NUM_ROWS; i++)
+      makeAllRowsUnvisited(maze[i]);
+  }
+
+  function makeAllRowsUnvisited(rows) {
+    for(var i = 0; i < 10; i++)
+      rows.push(0);
   }
 
   function createStartingPoint() {
     startingPoint = new Point(4, 9);
+  }
+
+  function generate() {
+    var currentPoint = startingPoint;
+    maze[currentPoint.getY()][currentPoint.getX()] = 1;
+  }
+
+  function toString() {
+    return "".concat(
+      maze[0].join(" "),"\n",
+      maze[1].join(" "),"\n",
+      maze[2].join(" "),"\n",
+      maze[3].join(" "),"\n",
+      maze[4].join(" "),"\n",
+      maze[5].join(" "),"\n",
+      maze[6].join(" "),"\n",
+      maze[7].join(" "),"\n",
+      maze[8].join(" "),"\n",
+      maze[9].join(" "));
   }
 
 }
@@ -142,24 +176,31 @@ Main = function() {
 }
 
 Tests = function() {
+  var tests = [];
   var results = [];
   var errors = [];
 
   this.runTests = function() {
-    run(testMazeCreation);
-    run(testPoint);
+    add(testPointX);
+    add(testPointY);
+    add(testPointToString);
+    runTestsFromList();
     printResults();
   }
 
-  function testMazeCreation() {
-    var maze = new MazeCreator();
-    assertEquals(10, maze.create().length);
+  function testPointX() {
+    var point = new Point(5, 0);
+    assertEquals(5, point.getX());
   }
 
-  function testPoint() {
-    var point = new Point(5, 8);
-    assertEquals(5, point.getX());
+  function testPointY() {
+    var point = new Point(0, 8);
     assertEquals(8, point.getY());
+  }
+
+  function testPointToString() {
+    var point = new Point(3, 5);
+    assertEquals("Point x: 3, y: 5", point.toString());
   }
 
   function assertEquals(expected, actual, message) {
@@ -173,6 +214,15 @@ Tests = function() {
 
   function fail(message) {
     throw new Error(message);
+  }
+
+  function add(test) {
+    tests.push(test);
+  }
+
+  function runTestsFromList() {
+    for(var i = 0; i < tests.length; i++)
+      run(tests[i]);
   }
   
   function run(test) {
