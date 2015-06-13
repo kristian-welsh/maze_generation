@@ -79,11 +79,11 @@ Point = function(x, y) {
   var x = x;
   var y = y;
 
-  function getX() {
+  this.getX = function() {
     return x;
   }
 
-  function getY() {
+  this.getY = function() {
     return y;
   }
 
@@ -144,11 +144,18 @@ Main = function() {
 Tests = function() {
   this.runTests = function() {
     testMazeCreation();
+    testPoint();
   }
 
   function testMazeCreation() {
     var maze = new MazeCreator();
     assertEquals(10, maze.create().length);
+  }
+
+  function testPoint() {
+    var point = new Point(5, 8);
+    assertEquals(5, point.getX());
+    assertEquals(8, point.getY());
   }
 
   function assertEquals(expected, actual, message) {
