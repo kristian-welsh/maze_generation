@@ -141,5 +141,30 @@ Main = function() {
 
 }
 
-new Main().doIt();
+Tests = function() {
+  this.runTests = function() {
+    testMazeCreation();
+  }
 
+  function testMazeCreation() {
+    var maze = new MazeCreator();
+    assertEquals(10, maze.create().length);
+  }
+
+  function assertEquals(expected, actual, message) {
+    message = message || "Assertion Failed: ".concat(
+      "expected = ", expected,
+      ", actual = ", actual,
+      ".");
+    if(expected !== actual)
+      fail(message);
+  }
+
+  function fail(message) {
+    throw new Error(message);
+  }
+
+}
+
+new Main().doIt();
+new Tests().runTests();
