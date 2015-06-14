@@ -98,6 +98,8 @@ Point = function(x, y) {
 // 2 = dead end
 MazeCreator = function() {
   var maze = [];
+  var hWalls = [];
+  var vWalls = [];
   var startingPoint;
 
   this.create = function() {
@@ -106,6 +108,7 @@ MazeCreator = function() {
     createStartingPoint();
     generate();
     alert(toString());
+    alert("H walls\n\n" + hWalls.join("; "));
     return maze;
   }
 
@@ -131,6 +134,27 @@ MazeCreator = function() {
   function generate() {
     var currentPoint = startingPoint;
     maze[currentPoint.getY()][currentPoint.getX()] = 1;
+    drawWallIfAtMazeEdge(currentPoint);
+  }
+
+  function drawWallIfAtMazeEdge(currentPoint) {
+    if(currentPoint.getX() == 0)
+      addVWallAt(currentPoint);
+    if(currentPoint.getX() == 9)
+      addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
+
+    if(currentPoint.getY() == 0)
+      addHWallAt(currentPoint);
+    if(currentPoint.getY() == 9)
+      addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
+  }
+
+  function addVWallAt(currentPoint) {
+    vWalls.push(currentPoint);
+  }
+
+  function addHWallAt(currentPoint) {
+    hWalls.push(currentPoint);
   }
 
   function toString() {
@@ -155,7 +179,6 @@ Main = function() {
     var context = retrieveCanvasContext();
     fillBackground(context);
     var maze = createMaze();
-    alert(maze);
     new Drawer(context).drawGrid();
   }
 
