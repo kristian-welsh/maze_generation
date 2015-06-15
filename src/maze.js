@@ -96,7 +96,7 @@ Point = function(x, y) {
 // 0 = unvisited
 // 1 = visited
 // 2 = dead end
-MazeCreator = function() {
+Maze = function() {
   var maze = [];
   var hWalls = [];
   var vWalls = [];
@@ -107,9 +107,8 @@ MazeCreator = function() {
     makeAllMazeUnvisited();
     createStartingPoint();
     generate();
-    alert(toString());
-    alert("H walls\n\n" + hWalls.join("; "));
-    return maze;
+    reportMaze();
+    reportWalls();
   }
 
   function createRowArrays() {
@@ -157,18 +156,35 @@ MazeCreator = function() {
     hWalls.push(currentPoint);
   }
 
-  function toString() {
-    return "".concat(
-      maze[0].join(" "),"\n",
-      maze[1].join(" "),"\n",
-      maze[2].join(" "),"\n",
-      maze[3].join(" "),"\n",
-      maze[4].join(" "),"\n",
-      maze[5].join(" "),"\n",
-      maze[6].join(" "),"\n",
-      maze[7].join(" "),"\n",
-      maze[8].join(" "),"\n",
+  function reportMaze() {
+    alert("" + 
+      maze[0].join(" ") + "\n" +
+      maze[1].join(" ") + "\n" +
+      maze[2].join(" ") + "\n" +
+      maze[3].join(" ") + "\n" +
+      maze[4].join(" ") + "\n" +
+      maze[5].join(" ") + "\n" +
+      maze[6].join(" ") + "\n" +
+      maze[7].join(" ") + "\n" +
+      maze[8].join(" ") + "\n" +
       maze[9].join(" "));
+  }
+
+  function reportWalls() {
+    alert("" + 
+      "H walls\n\n" + 
+      hWalls.join("\n") +
+      "\n\n" +
+      "V walls\n\n" +
+      vWalls.join("\n"));
+  }
+
+  this.getHWalls = function() {
+    return hWalls;
+  }
+
+  this.getVWalls = function() {
+    return vWalls;
   }
 
 }
@@ -178,12 +194,8 @@ Main = function() {
   this.doIt = function() {
     var context = retrieveCanvasContext();
     fillBackground(context);
-    var maze = createMaze();
+    new Maze().create();
     new Drawer(context).drawGrid();
-  }
-
-  function createMaze() {
-    return new MazeCreator().create();
   }
 
   function retrieveCanvasContext() {
@@ -207,6 +219,7 @@ Tests = function() {
     add(testPointX);
     add(testPointY);
     add(testPointToString);
+    add(testMazeStartingPointCreatesEdgeWall);
     runTestsFromList();
     printResults();
   }
@@ -224,6 +237,18 @@ Tests = function() {
   function testPointToString() {
     var point = new Point(3, 5);
     assertEquals("Point x: 3, y: 5", point.toString());
+  }
+
+  function testMazeStartingPointCreatesEdgeWall() {
+    var maze = new Maze();
+    maze.create();
+    var hWalls = maze.getHWalls();
+    assertPointEquals(new Point(4, 10), hWalls[0]);
+  }
+
+  function assertPointEquals(expected, actual, message) {
+    assertEquals(expected.getX(), actual.getX(), message);
+    assertEquals(expected.getY(), actual.getY(), message);
   }
 
   function assertEquals(expected, actual, message) {
