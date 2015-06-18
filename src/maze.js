@@ -236,16 +236,22 @@ Tests = function() {
   }
 
   function testMazeStartingPointCreatesEdgeWall() {
-    assertCreatesHEdgeWall(new Point(4, 9), new Point(4, 10));
-    assertCreatesHEdgeWall(new Point(4, 0), new Point(4, 0));
-
+    assertCreatesHWall(new Point(4, 9), new Point(4, 10));
+    assertCreatesHWall(new Point(4, 0), new Point(4, 0));
+    assertCreatesVWall(new Point(9, 4), new Point(10, 4));
+    assertCreatesVWall(new Point(0, 4), new Point(0, 4));
   }
 
-  function assertCreatesHEdgeWall(startPoint, wallLocation) {
+  function assertCreatesVWall(startPoint, wallLocation) {
     var maze = new Maze();
     maze.create(startPoint);
-    var hWalls = maze.getHWalls();
-    assertPointEquals(wallLocation, hWalls[0]);
+    assertPointEquals(wallLocation, maze.getVWalls()[0]);
+  }
+
+  function assertCreatesHWall(startPoint, wallLocation) {
+    var maze = new Maze();
+    maze.create(startPoint);
+    assertPointEquals(wallLocation, maze.getHWalls()[0]);
   }
 
   function assertPointEquals(expected, actual, message) {
