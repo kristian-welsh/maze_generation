@@ -304,6 +304,18 @@ Tests = function() {
 
   function printResults() {
     console.log(results.join(" "));
+
+    if(errors.length > 0)
+      printErrors();
+    else
+      printCelebration();
+  }
+
+  function printCelebration() {
+    console.log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
+  }
+
+  function printErrors() {
     for(var i = 0; i < errors.length; i++)
       console.log(errors[i]);
   }
