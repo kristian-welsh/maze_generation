@@ -102,10 +102,10 @@ Maze = function() {
   var vWalls = [];
   var startingPoint;
 
-  this.create = function() {
+  this.create = function(start) {
     createRowArrays();
     makeAllMazeUnvisited();
-    createStartingPoint();
+    startingPoint = start;
     generate();
     reportMaze();
     reportWalls();
@@ -124,10 +124,6 @@ Maze = function() {
   function makeAllRowsUnvisited(rows) {
     for(var i = 0; i < 10; i++)
       rows.push(0);
-  }
-
-  function createStartingPoint() {
-    startingPoint = new Point(4, 9);
   }
 
   function generate() {
@@ -194,7 +190,7 @@ Main = function() {
   this.doIt = function() {
     var context = retrieveCanvasContext();
     fillBackground(context);
-    new Maze().create();
+    new Maze().create(new Point(4, 9));
     new Drawer(context).drawGrid();
   }
 
@@ -240,10 +236,16 @@ Tests = function() {
   }
 
   function testMazeStartingPointCreatesEdgeWall() {
+    assertCreatesHEdgeWall(new Point(4, 9), new Point(4, 10));
+    assertCreatesHEdgeWall(new Point(4, 0), new Point(4, 0));
+
+  }
+
+  function assertCreatesHEdgeWall(startPoint, wallLocation) {
     var maze = new Maze();
-    maze.create();
+    maze.create(startPoint);
     var hWalls = maze.getHWalls();
-    assertPointEquals(new Point(4, 10), hWalls[0]);
+    assertPointEquals(wallLocation, hWalls[0]);
   }
 
   function assertPointEquals(expected, actual, message) {
