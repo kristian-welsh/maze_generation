@@ -304,11 +304,16 @@ Tests = function() {
 
   function printResults() {
     console.log(results.join(" "));
-
+    printStatistics();
+    
     if(errors.length > 0)
       printErrors();
     else
       printCelebration();
+  }
+
+  function printStatistics() {
+    console.log(tests.length + " tests run, " + errors.length + " failures.");
   }
 
   function printCelebration() {
