@@ -107,8 +107,6 @@ Maze = function() {
     makeAllMazeUnvisited();
     startingPoint = start;
     generate();
-    reportMaze();
-    reportWalls();
   }
 
   function createRowArrays() {
@@ -150,6 +148,11 @@ Maze = function() {
 
   function addHWallAt(currentPoint) {
     hWalls.push(currentPoint);
+  }
+
+  this.report = function() {
+    reportMaze();
+    reportWalls();
   }
 
   function reportMaze() {
