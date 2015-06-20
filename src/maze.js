@@ -213,6 +213,7 @@ Tests = function() {
   var tests = [];
   var results = [];
   var errors = [];
+  var output = "";
 
   this.runTests = function() {
     add(testPointX);
@@ -303,26 +304,46 @@ Tests = function() {
   }
 
   function printResults() {
-    console.log(results.join(" "));
-    printStatistics();
-    
+    logResults();
+    logStatistics();
+    logAnyErrors();
+    logCelebrationIfNeeded();
+    printLog();
+  }
+
+  function logResults() {
+    log(results.join(" "));
+  }
+
+  function logStatistics() {
+    log(tests.length + " tests run, " + errors.length + " failures.");
+  }
+
+  function logAnyErrors() {
     if(errors.length > 0)
-      printErrors();
-    else
-      printCelebration();
+      logErrors();
   }
 
-  function printStatistics() {
-    console.log(tests.length + " tests run, " + errors.length + " failures.");
-  }
-
-  function printCelebration() {
-    console.log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
-  }
-
-  function printErrors() {
+  function logErrors() {
     for(var i = 0; i < errors.length; i++)
       console.log(errors[i]);
+  }
+
+  function logCelebrationIfNeeded() {
+    if(errors.length <= 0)
+      logCelebration();
+  }
+
+  function logCelebration() {
+    log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
+  }
+
+  function log(item) {
+    output += item + "\n";
+  }
+
+  function printLog() {
+    console.log(output);
   }
 
 }
