@@ -304,6 +304,17 @@ Tests = function() {
   }
 
   function printResults() {
+    var celebration = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
+    var printer = new TestResultsPrinter(results, tests, errors, celebration);
+    printer.printResults();
+  }
+
+}
+
+TestResultsPrinter = function(results, tests, errors, celebration) {
+  var output = "";
+
+  this.printResults = function() {
     logResults();
     logStatistics();
     logAnyErrors();
