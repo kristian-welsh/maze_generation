@@ -318,8 +318,9 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     logResults();
     logStatistics();
     logCelebrationIfNeeded();
+    logNewline();
+    logAnyErrors();
     printLog();
-    printAnyErrors();
   }
 
   function logResults() {
@@ -330,18 +331,18 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     log(tests.length + " tests run, " + errors.length + " failures.");
   }
 
-  function printAnyErrors() {
+  function logAnyErrors() {
     if(errors.length > 0)
-      printErrors();
+      logErrors();
   }
 
-  function printErrors() {
+  function logErrors() {
     for(var i = 0; i < errors.length; i++)
-      printError(i);
+      logError(i);
   }
 
-  function printError(i) {
-    console.log(errors[i]);
+  function logError(i) {
+    log(errors[i].stack);
   }
 
   function logCelebrationIfNeeded() {
@@ -351,6 +352,11 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
 
   function logCelebration() {
     log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
+  }
+
+  function logNewline() {
+    //logging inserts new line. So to log just a new line, log an empty string.
+    log("");
   }
 
   function log(item) {
