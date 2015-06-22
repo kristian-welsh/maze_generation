@@ -259,7 +259,7 @@ Tests = function() {
   }
 
   function assertPointEquals(expected, actual, message) {
-    assertEquals(expected.getX(), actual.getX(), message);
+    assertEquals(expected.getX() + 1, actual.getX(), message);
     assertEquals(expected.getY(), actual.getY(), message);
   }
 
@@ -317,9 +317,9 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
   this.printResults = function() {
     logResults();
     logStatistics();
-    logAnyErrors();
     logCelebrationIfNeeded();
     printLog();
+    printAnyErrors();
   }
 
   function logResults() {
@@ -330,14 +330,18 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     log(tests.length + " tests run, " + errors.length + " failures.");
   }
 
-  function logAnyErrors() {
+  function printAnyErrors() {
     if(errors.length > 0)
-      logErrors();
+      printErrors();
   }
 
-  function logErrors() {
+  function printErrors() {
     for(var i = 0; i < errors.length; i++)
-      console.log(errors[i]);
+      printError(i);
+  }
+
+  function printError(i) {
+    console.log(errors[i]);
   }
 
   function logCelebrationIfNeeded() {
