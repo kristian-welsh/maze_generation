@@ -319,7 +319,6 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     logResults();
     logStatistics();
     logCelebrationIfNoErrors();
-    logNewline();
     logErrors();
     printLog();
   }
@@ -345,17 +344,18 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     log(CELEBRATION);
   }
 
-  function logNewline() {
-    //logging inserts new line. So to log just a new line, log an empty string.
-    log("");
-  }
-
   function logErrors() {
     forEach(errors, logStack);
   }
 
   function logStack(error) {
+    logNewline();
     log(error.stack);
+  }
+
+  function logNewline() {
+    //logging inserts new line. So to log just a new line, log an empty string.
+    log("");
   }
 
   function log(item) {
