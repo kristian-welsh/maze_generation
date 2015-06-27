@@ -259,7 +259,7 @@ Tests = function() {
   }
 
   function assertPointEquals(expected, actual, message) {
-    assertEquals(expected.getX() + 1, actual.getX(), message);
+    assertEquals(expected.getX(), actual.getX(), message);
     assertEquals(expected.getY(), actual.getY(), message);
   }
 
@@ -313,13 +313,14 @@ Tests = function() {
 
 TestResultsPrinter = function(results, tests, errors, celebration) {
   var output = "";
+  var CELEBRATION = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
 
   this.printResults = function() {
     logResults();
     logStatistics();
-    logCelebrationIfNeeded();
+    logCelebrationIfNoErrors();
     logNewline();
-    logAnyErrors();
+    logErrors();
     printLog();
   }
 
@@ -331,32 +332,30 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     log(tests.length + " tests run, " + errors.length + " failures.");
   }
 
-  function logAnyErrors() {
-    if(errors.length > 0)
-      logErrors();
-  }
-
-  function logErrors() {
-    for(var i = 0; i < errors.length; i++)
-      logError(i);
-  }
-
-  function logError(i) {
-    log(errors[i].stack);
-  }
-
-  function logCelebrationIfNeeded() {
-    if(errors.length <= 0)
+  function logCelebrationIfNoErrors() {
+    if(numErrors() <= 0)
       logCelebration();
   }
 
+  function numErrors() {
+    return errors.length;
+  }
+
   function logCelebration() {
-    log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
+    log(CELEBRATION);
   }
 
   function logNewline() {
     //logging inserts new line. So to log just a new line, log an empty string.
     log("");
+  }
+
+  function logErrors() {
+    forEach(errors, logStack);
+  }
+
+  function logStack(error) {
+    log(error.stack);
   }
 
   function log(item) {
@@ -367,6 +366,11 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     console.log(output);
   }
 
+}
+
+function forEach(array, callback) {
+  for(var i = 0; i < array.length; i++)
+    callback(array[i]);
 }
 
 new Main().doIt();
