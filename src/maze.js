@@ -213,6 +213,7 @@ Tests = function() {
   var tests = [];
   var results = [];
   var errors = [];
+  var failures = [];
   var output = "";
 
   this.runTests = function() {
@@ -264,10 +265,10 @@ Tests = function() {
   }
 
   function assertEquals(expected, actual, message) {
-    message = message || "Assertion Failed: ".concat(
+    message = "Assertion Failed: ".concat(
       "expected = ", expected,
       ", actual = ", actual,
-      ".");
+      ". ", message);
     if(expected !== actual)
       fail(message);
   }
@@ -284,34 +285,47 @@ Tests = function() {
     for(var i = 0; i < tests.length; i++)
       run(tests[i]);
   }
-  
+
   function run(test) {
     try {
       test();
       logPass();
     } catch(error) {
-      logFailure(error);
+      processTestError(error);
     }
+  }
+
+  function processTestError(error) {
+    isFailure(error) ? logFailure(error) : logError(error);
   }
 
   function logPass() {
     results.push(".");
   }
 
-  function logFailure(error) {
+  function isFailure(error) {
+    return error.toString().slice(0, 24) == "Error: Assertion Failed:";
+  }
+
+  function logFailure(failure) {
     results.push("F");
+    failures.push(failure);
+  }
+
+  function logError(error) {
+    results.push("E");
     errors.push(error);
   }
 
   function printResults() {
     var celebration = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
-    var printer = new TestResultsPrinter(results, tests, errors, celebration);
+    var printer = new TestResultsPrinter(results, tests, errors, failures, celebration);
     printer.printResults();
   }
 
 }
 
-TestResultsPrinter = function(results, tests, errors, celebration) {
+TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   var output = "";
   var CELEBRATION = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
 
@@ -320,6 +334,7 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     logStatistics();
     logCelebrationIfNoErrors();
     logErrors();
+    logFailures();
     printLog();
   }
 
@@ -328,7 +343,7 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
   }
 
   function logStatistics() {
-    log(tests.length + " tests run, " + errors.length + " failures.");
+    log(tests.length + " tests run, " + errors.length + " errors, " + failures.length + " failures.");
   }
 
   function logCelebrationIfNoErrors() {
@@ -346,6 +361,10 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
 
   function logErrors() {
     forEach(errors, logStack);
+  }
+
+  function logFailures() {
+    forEach(failures, logStack);
   }
 
   function logStack(error) {
@@ -375,3 +394,9 @@ function forEach(array, callback) {
 
 new Main().doIt();
 new Tests().runTests();
+
+function subString() {
+
+}
+
+alert(new Error("hi").toString().slice(0, 5));
