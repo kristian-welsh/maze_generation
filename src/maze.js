@@ -342,20 +342,24 @@ TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   }
 
   function logStatistics() {
-    log(tests.length + " tests run, " + errors.length + " errors, " + failures.length + " failures.");
+    log(numTests() + " tests run, " + numErrors() + " errors, " + numFailures() + " failures.");
   }
 
   function logCelebrationIfNoErrors() {
-    if(numErrors() <= 0)
-      logCelebration();
+    if(numErrors() == 0)
+      log(celebration);
+  }
+
+  function numTests() {
+    return tests.length;
+  }
+
+  function numFailures() {
+    return failures.length;
   }
 
   function numErrors() {
     return errors.length;
-  }
-
-  function logCelebration() {
-    log(celebration);
   }
 
   function logErrors() {
