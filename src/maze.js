@@ -327,7 +327,6 @@ Tests = function() {
 
 TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   var output = "";
-  var CELEBRATION = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
 
   this.printResults = function() {
     logResults();
@@ -356,7 +355,7 @@ TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   }
 
   function logCelebration() {
-    log(CELEBRATION);
+    log(celebration);
   }
 
   function logErrors() {
@@ -394,9 +393,3 @@ function forEach(array, callback) {
 
 new Main().doIt();
 new Tests().runTests();
-
-function subString() {
-
-}
-
-alert(new Error("hi").toString().slice(0, 5));
