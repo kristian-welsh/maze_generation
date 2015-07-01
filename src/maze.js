@@ -170,10 +170,43 @@ Tests = function() {
   }
 
   function testMazeStartingPointCreatesEdgeWall() {
-    assertCreatesHWall(new Point(4, 9), new Point(4, 10));
-    assertCreatesHWall(new Point(4, 0), new Point(4, 0));
-    assertCreatesVWall(new Point(9, 4), new Point(10, 4));
-    assertCreatesVWall(new Point(0, 4), new Point(0, 4));
+    mazeStartingPointAtTopCreatesTopEdgeWall();
+    mazeStartingPointAtBottomCreatesBottomEdgeWall();
+    mazeStartingPointAtLeftCreatesLeftEdgeWall();
+    mazeStartingPointAtRightCreatesRightEdgeWall();
+    mazeStartingPointInMiddleDoesNotCreateEdgeWall();
+  }
+
+  function mazeStartingPointAtTopCreatesTopEdgeWall() {
+    assertCreatesHWall(new Point(0, 0), new Point(0, 0));
+    assertCreatesHWall(new Point(9, 0), new Point(9, 0));
+  }
+
+  function mazeStartingPointAtBottomCreatesBottomEdgeWall() {
+    assertCreatesHWall(new Point(0, 9), new Point(0, 10));
+    assertCreatesHWall(new Point(9, 9), new Point(9, 10));
+  }
+
+  function mazeStartingPointAtLeftCreatesLeftEdgeWall() {
+    assertCreatesVWall(new Point(0, 0), new Point(0, 0));
+    assertCreatesVWall(new Point(0, 9), new Point(0, 9));
+  }
+
+  function mazeStartingPointAtRightCreatesRightEdgeWall() {
+    assertCreatesVWall(new Point(9, 0), new Point(10, 0));
+    assertCreatesVWall(new Point(9, 9), new Point(10, 9));
+  }
+
+  function mazeStartingPointInMiddleDoesNotCreateEdgeWall() {
+    assertCreatesNoWalls(new Point(1, 1));
+    assertCreatesNoWalls(new Point(8, 8));
+  }
+
+  function assertCreatesNoWalls(startPoint) {
+    var maze = new Maze();
+    maze.create(startPoint);
+    assertEquals(0, maze.getVWalls().length);
+    assertEquals(0, maze.getHWalls().length);
   }
 
   function assertCreatesVWall(startPoint, wallLocation) {
