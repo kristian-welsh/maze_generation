@@ -61,10 +61,9 @@ Maze = function() {
   }
 
   function drawWallIfAtMazeEdge(currentPoint) {
-    if(currentPoint.getX() == 0)
-      addVWallAt(currentPoint);
-    if(currentPoint.getX() == 9)
-      addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
+    var vWallPos = new MazeEdger().edgeVFor(currentPoint);
+    if(vWallPos)
+      addVWallAt(vWallPos);
 
     var hWallPos = new MazeEdger().edgeHFor(currentPoint);
     if(hWallPos)
@@ -126,6 +125,14 @@ MazeEdger = function () {
     if(pointToCheck.getY() == 9)
       return new Point(pointToCheck.getX(), pointToCheck.getY() + 1);
     return null
+  }
+
+  this.edgeVFor = function (pointToCheck) {
+    if(pointToCheck.getX() == 0)
+      return pointToCheck;
+    if(pointToCheck.getX() == 9)
+      return new Point(pointToCheck.getX() + 1, pointToCheck.getY());
+    return null;
   }
 
 }
