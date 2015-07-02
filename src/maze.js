@@ -66,10 +66,9 @@ Maze = function() {
     if(currentPoint.getX() == 9)
       addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
 
-    if(currentPoint.getY() == 0)
-      addHWallAt(currentPoint);
-    if(currentPoint.getY() == 9)
-      addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
+    var hWallPos = new MazeEdger().edgeHFor(currentPoint);
+    if(hWallPos)
+      addHWallAt(hWallPos);
   }
 
   function addVWallAt(currentPoint) {
@@ -114,6 +113,19 @@ Maze = function() {
 
   this.getVWalls = function() {
     return vWalls;
+  }
+
+}
+
+MazeEdger = function () {
+  
+  //When given a point it will return a point to draw a horizontal wall at (or null if no wall needed).
+  this.edgeHFor = function (pointToCheck) {
+    if(pointToCheck.getY() == 0)
+      return pointToCheck;
+    if(pointToCheck.getY() == 9)
+      return new Point(pointToCheck.getX(), pointToCheck.getY() + 1);
+    return null
   }
 
 }
@@ -220,6 +232,7 @@ Tests = function() {
   }
 
   function assertPointEquals(expected, actual, message) {
+    assertNotNull(actual);
     assertEquals(expected.getX(), actual.getX(), message);
     assertEquals(expected.getY(), actual.getY(), message);
   }
@@ -230,6 +243,13 @@ Tests = function() {
       ", actual = ", actual,
       ". ", message);
     if(expected !== actual)
+      fail(message);
+  }
+
+  function assertNotNull(actual, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to not be null. ", message);
+    if(!actual)
       fail(message);
   }
 
