@@ -149,7 +149,13 @@ Tests = function() {
     add(testPointX);
     add(testPointY);
     add(testPointToString);
-    add(testMazeStartingPointCreatesEdgeWall);
+
+    add(testMazeStartingPointAtTopCreatesTopEdgeWall);
+    add(testMazeStartingPointAtBottomCreatesBottomEdgeWall);
+    add(testMazeStartingPointAtLeftCreatesLeftEdgeWall);
+    add(testMazeStartingPointAtRightCreatesRightEdgeWall);
+    add(testMazeStartingPointInMiddleDoesNotCreateEdgeWall);
+
     runTestsFromList();
     printResults();
   }
@@ -169,35 +175,27 @@ Tests = function() {
     assertEquals("Point x: 3, y: 5", point.toString());
   }
 
-  function testMazeStartingPointCreatesEdgeWall() {
-    mazeStartingPointAtTopCreatesTopEdgeWall();
-    mazeStartingPointAtBottomCreatesBottomEdgeWall();
-    mazeStartingPointAtLeftCreatesLeftEdgeWall();
-    mazeStartingPointAtRightCreatesRightEdgeWall();
-    mazeStartingPointInMiddleDoesNotCreateEdgeWall();
-  }
-
-  function mazeStartingPointAtTopCreatesTopEdgeWall() {
+  function testMazeStartingPointAtTopCreatesTopEdgeWall() {
     assertCreatesHWall(new Point(0, 0), new Point(0, 0));
     assertCreatesHWall(new Point(9, 0), new Point(9, 0));
   }
 
-  function mazeStartingPointAtBottomCreatesBottomEdgeWall() {
+  function testMazeStartingPointAtBottomCreatesBottomEdgeWall() {
     assertCreatesHWall(new Point(0, 9), new Point(0, 10));
     assertCreatesHWall(new Point(9, 9), new Point(9, 10));
   }
 
-  function mazeStartingPointAtLeftCreatesLeftEdgeWall() {
+  function testMazeStartingPointAtLeftCreatesLeftEdgeWall() {
     assertCreatesVWall(new Point(0, 0), new Point(0, 0));
     assertCreatesVWall(new Point(0, 9), new Point(0, 9));
   }
 
-  function mazeStartingPointAtRightCreatesRightEdgeWall() {
+  function testMazeStartingPointAtRightCreatesRightEdgeWall() {
     assertCreatesVWall(new Point(9, 0), new Point(10, 0));
     assertCreatesVWall(new Point(9, 9), new Point(10, 9));
   }
 
-  function mazeStartingPointInMiddleDoesNotCreateEdgeWall() {
+  function testMazeStartingPointInMiddleDoesNotCreateEdgeWall() {
     assertCreatesNoWalls(new Point(1, 1));
     assertCreatesNoWalls(new Point(8, 8));
   }
