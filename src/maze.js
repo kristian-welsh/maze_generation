@@ -9,6 +9,14 @@ Point = function(x, y) {
   var x = x;
   var y = y;
 
+  this.plusX = function (amount) {
+    return new Point(x + amount, y);
+  }
+
+  this.plusY = function (amount) {
+    return new Point(x, y + amount);
+  }
+
   this.getX = function() {
     return x;
   }
@@ -123,7 +131,7 @@ MazeEdger = function () {
     if(pointToCheck.getY() == 0)
       return pointToCheck;
     if(pointToCheck.getY() == 9)
-      return new Point(pointToCheck.getX(), pointToCheck.getY() + 1);
+      return pointToCheck.plusY(1);
     return null
   }
 
@@ -131,7 +139,7 @@ MazeEdger = function () {
     if(pointToCheck.getX() == 0)
       return pointToCheck;
     if(pointToCheck.getX() == 9)
-      return new Point(pointToCheck.getX() + 1, pointToCheck.getY());
+      return pointToCheck.plusX(1);
     return null;
   }
 
