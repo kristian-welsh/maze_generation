@@ -128,7 +128,6 @@ MazeEdger = function () {
       return pointToCheck;
     if(pointToCheck.getY() == 9)
       return pointToCheck.plus(0, 1);
-    return null
   }
 
   this.edgeVFor = function (pointToCheck) {
@@ -136,7 +135,6 @@ MazeEdger = function () {
       return pointToCheck;
     if(pointToCheck.getX() == 9)
       return pointToCheck.plus(1, 0);
-    return null;
   }
 
 }
