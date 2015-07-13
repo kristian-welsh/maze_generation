@@ -161,10 +161,7 @@ Main = function() {
 
 Tests = function() {
   var tests = [];
-  var results = [];
-  var errors = [];
-  var failures = [];
-  var output = "";
+  var resultsLogger = new ResultsLogger();
 
   this.runTests = function() {
     addTestsToList([
@@ -292,30 +289,52 @@ Tests = function() {
     isFailure(error) ? logFailure(error) : logError(error);
   }
 
-  function logPass() {
-    results.push(".");
-  }
-
   function isFailure(error) {
     return error.toString().slice(0, 24) == "Error: Assertion Failed:";
   }
 
+  function logPass() {
+    resultsLogger.logPass();
+  }
+
   function logFailure(failure) {
+    resultsLogger.logFailure(failure);
+  }
+
+  function logError(error) {
+    resultsLogger.logError(error);
+  }
+
+  function printResults() {
+    resultsLogger.printResults(tests);
+  }
+
+}
+
+ResultsLogger = function () {
+  var results = [];
+  var errors = [];
+  var failures = [];
+
+  this.logPass = function() {
+    results.push(".");
+  }
+
+  this.logFailure = function(failure) {
     results.push("F");
     failures.push(failure);
   }
 
-  function logError(error) {
+  this.logError = function(error) {
     results.push("E");
     errors.push(error);
   }
 
-  function printResults() {
+  this.printResults = function(tests) {
     var celebration = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
     var printer = new TestResultsPrinter(results, tests, errors, failures, celebration);
     printer.printResults();
   }
-
 }
 
 TestResultsPrinter = function(results, tests, errors, failures, celebration) {
