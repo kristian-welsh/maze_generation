@@ -167,16 +167,16 @@ Tests = function() {
   var output = "";
 
   this.runTests = function() {
-    add(testPointX);
-    add(testPointY);
-    add(testPointToString);
-
-    add(testMazeStartingPointAtTopCreatesTopEdgeWall);
-    add(testMazeStartingPointAtBottomCreatesBottomEdgeWall);
-    add(testMazeStartingPointAtLeftCreatesLeftEdgeWall);
-    add(testMazeStartingPointAtRightCreatesRightEdgeWall);
-    add(testMazeStartingPointInMiddleDoesNotCreateEdgeWall);
-
+    addTestsToList([
+      testPointX,
+      testPointY,
+      testPointToString,
+      testMazeStartingPointAtTopCreatesTopEdgeWall,
+      testMazeStartingPointAtBottomCreatesBottomEdgeWall,
+      testMazeStartingPointAtLeftCreatesLeftEdgeWall,
+      testMazeStartingPointAtRightCreatesRightEdgeWall,
+      testMazeStartingPointInMiddleDoesNotCreateEdgeWall
+    ]);
     runTestsFromList();
     printResults();
   }
@@ -266,7 +266,11 @@ Tests = function() {
     throw new Error(message);
   }
 
-  function add(test) {
+  function addTestsToList(tests) {
+    forEach(tests, addTest);
+  }
+
+  function addTest(test) {
     tests.push(test);
   }
 
