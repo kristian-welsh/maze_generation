@@ -279,30 +279,18 @@ Tests = function() {
   function run(test) {
     try {
       test();
-      logPass();
+      resultsLogger.logPass();
     } catch(error) {
       processTestError(error);
     }
   }
 
   function processTestError(error) {
-    isFailure(error) ? logFailure(error) : logError(error);
+    isFailure(error) ? resultsLogger.logFailure(error) : resultsLogger.logError(error);
   }
 
   function isFailure(error) {
     return error.toString().slice(0, 24) == "Error: Assertion Failed:";
-  }
-
-  function logPass() {
-    resultsLogger.logPass();
-  }
-
-  function logFailure(failure) {
-    resultsLogger.logFailure(failure);
-  }
-
-  function logError(error) {
-    resultsLogger.logError(error);
   }
 
   function printResults() {
