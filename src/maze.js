@@ -161,7 +161,7 @@ Main = function() {
 
 Tests = function() {
   var tests = [];
-  var resultsLogger = new ResultsLogger();
+  var results = new Results();
 
   this.runTests = function() {
     addTestsToList([
@@ -279,14 +279,14 @@ Tests = function() {
   function run(test) {
     try {
       test();
-      resultsLogger.logPass();
+      results.logPass();
     } catch(error) {
       processTestError(error);
     }
   }
 
   function processTestError(error) {
-    isFailure(error) ? resultsLogger.logFailure(error) : resultsLogger.logError(error);
+    isFailure(error) ? results.logFailure(error) : results.logError(error);
   }
 
   function isFailure(error) {
@@ -294,12 +294,12 @@ Tests = function() {
   }
 
   function printResults() {
-    resultsLogger.printResults(tests);
+    results.printResults(tests);
   }
 
 }
 
-ResultsLogger = function () {
+Results = function () {
   var results = [];
   var errors = [];
   var failures = [];
