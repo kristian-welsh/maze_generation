@@ -172,7 +172,8 @@ Tests = function() {
       testMazeStartingPointAtBottomCreatesBottomEdgeWall,
       testMazeStartingPointAtLeftCreatesLeftEdgeWall,
       testMazeStartingPointAtRightCreatesRightEdgeWall,
-      testMazeStartingPointInMiddleDoesNotCreateEdgeWall
+      testMazeStartingPointInMiddleDoesNotCreateEdgeWall,
+      testRandomBetween
     ]);
     runTestsFromList();
     printResults();
@@ -218,6 +219,16 @@ Tests = function() {
     assertCreatesNoWalls(new Point(8, 8));
   }
 
+  function testRandomBetween() {
+    for(var i = 0; i < 100; i++)
+      assertRandomBetweenWithinBounds(-i, i);
+  }
+
+  function assertRandomBetweenWithinBounds(lower, upper) {
+    var random = randomIntBetween(lower, upper);
+    assertTrue(lower <= random && random <= upper);
+  }
+
   function assertCreatesNoWalls(startPoint) {
     var maze = new Maze();
     maze.create(startPoint);
@@ -259,12 +270,19 @@ Tests = function() {
       fail(message);
   }
 
+  function assertTrue(condition, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to be true. ", message);
+    if(!condition)
+      fail(message);
+  }
+
   function fail(message) {
     throw new Error(message);
   }
 
   function addTestsToList(tests) {
-    forEach(tests, addTest);
+    tests.map(addTest);
   }
 
   function addTest(test) {
@@ -363,11 +381,11 @@ TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   }
 
   function logErrors() {
-    forEach(errors, logStack);
+    errors.map(logStack);
   }
 
   function logFailures() {
-    forEach(failures, logStack);
+    failures.map(logStack);
   }
 
   function logStack(error) {
@@ -390,9 +408,9 @@ TestResultsPrinter = function(results, tests, errors, failures, celebration) {
 
 }
 
-function forEach(array, callback) {
-  for(var i = 0; i < array.length; i++)
-    callback(array[i]);
+// returns any int between and including the arguments.
+function randomIntBetween(lowerBound, upperBound) {
+  return Math.round(Math.random() * (upperBound - lowerBound)) + lowerBound;
 }
 
 new Main().doIt();
