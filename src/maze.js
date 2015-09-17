@@ -14,6 +14,10 @@ Point = function(x, y) {
   var x = x;
   var y = y;
 
+  this.plus = function (addX, addY) {
+    return new Point(x + addX, y + addY);
+  }
+
   this.getX = function() {
     return x;
   }
@@ -178,18 +182,24 @@ Main = function() {
 
 }
 
+// In future i would like to seperate each class's tests into 1 class each inheriting from tests.
+// I  would also like to test MazeEdgeDrawer seperately from MazeCreator.
 Tests = function() {
   var tests = [];
-  var results = [];
-  var errors = [];
-  var output = "";
+  var results = new Results();
 
   this.runTests = function() {
-    add(testPointX);
-    add(testPointY);
-    add(testPointToString);
-    add(testMazeStartingPointCreatesEdgeWall);
-	add(testMazeCreatesWallAboveStart);
+    addTestsToList([
+      testPointX,
+      testPointY,
+      testPointToString,
+      testMazeStartingPointAtTopCreatesTopEdgeWall,
+      testMazeStartingPointAtBottomCreatesBottomEdgeWall,
+      testMazeStartingPointAtLeftCreatesLeftEdgeWall,
+      testMazeStartingPointAtRightCreatesRightEdgeWall,
+      testMazeCreatesWallAboveStart,
+      testRandomBetween
+    ]);
     runTestsFromList();
     printResults();
   }
@@ -209,11 +219,41 @@ Tests = function() {
     assertEquals("Point x: 3, y: 5", point.toString());
   }
 
-  function testMazeStartingPointCreatesEdgeWall() {
-    assertCreatesHWall(new Point(4, 9), new Point(4, 10));
-    assertCreatesHWall(new Point(4, 0), new Point(4, 0));
-    assertCreatesVWall(new Point(9, 4), new Point(10, 4));
-    assertCreatesVWall(new Point(0, 4), new Point(0, 4));
+  function testMazeStartingPointAtTopCreatesTopEdgeWall() {
+    assertCreatesHWall(new Point(0, 0), new Point(0, 0));
+    assertCreatesHWall(new Point(9, 0), new Point(9, 0));
+  }
+
+  function testMazeStartingPointAtBottomCreatesBottomEdgeWall() {
+    assertCreatesHWall(new Point(0, 9), new Point(0, 10));
+    assertCreatesHWall(new Point(9, 9), new Point(9, 10));
+  }
+
+  function testMazeStartingPointAtLeftCreatesLeftEdgeWall() {
+    assertCreatesVWall(new Point(0, 0), new Point(0, 0));
+    assertCreatesVWall(new Point(0, 9), new Point(0, 9));
+  }
+
+  function testMazeStartingPointAtRightCreatesRightEdgeWall() {
+    assertCreatesVWall(new Point(9, 0), new Point(10, 0));
+    assertCreatesVWall(new Point(9, 9), new Point(10, 9));
+  }
+
+  function testRandomBetween() {
+    for(var i = 0; i < 100; i++)
+      assertRandomBetweenWithinBounds(-i, i);
+  }
+
+  function assertRandomBetweenWithinBounds(lower, upper) {
+    var random = randomIntBetween(lower, upper);
+    assertTrue(lower <= random && random <= upper);
+  }
+
+  function assertCreatesNoWalls(startPoint) {
+    var maze = new Maze();
+    maze.create(startPoint);
+    assertEquals(0, maze.getVWalls().length);
+    assertEquals(0, maze.getHWalls().length);
   }
 
   function assertCreatesVWall(startPoint, wallLocation) {
@@ -239,17 +279,32 @@ Tests = function() {
   }
 
   function assertPointEquals(expected, actual, message) {
+    assertNotNull(actual);
     assertEquals(expected.getX(), actual.getX(), message);
     assertEquals(expected.getY(), actual.getY(), message);
   }
 
   function assertEquals(expected, actual, message) {
-	//if no message was passed in, create one from parameters.
+    //if no message was passed in, create one from parameters.
     message = message || "Assertion Failed: ".concat(
       "expected = ", expected,
       ", actual = ", actual,
-      ".");
+      ". ", message);
     if(expected !== actual)
+      fail(message);
+  }
+
+  function assertNotNull(actual, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to not be null. ", message);
+    if(!actual)
+      fail(message);
+  }
+
+  function assertTrue(condition, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to be true. ", message);
+    if(!condition)
       fail(message);
   }
 
@@ -257,7 +312,11 @@ Tests = function() {
     throw new Error(message);
   }
 
-  function add(test) {
+  function addTestsToList(tests) {
+    tests.map(addTest);
+  }
+
+  function addTest(test) {
     tests.push(test);
   }
 
@@ -265,42 +324,65 @@ Tests = function() {
     for(var i = 0; i < tests.length; i++)
       run(tests[i]);
   }
-  
+
   function run(test) {
     try {
       test();
-      logPass();
+      results.logPass();
     } catch(error) {
-      logFailure(error);
+      processTestError(error);
     }
   }
 
-  function logPass() {
-    results.push(".");
+  function processTestError(error) {
+    isFailure(error) ? results.logFailure(error) : results.logError(error);
   }
 
-  function logFailure(error) {
-    results.push("F");
-    errors.push(error);
+  function isFailure(error) {
+    return error.toString().slice(0, 24) == "Error: Assertion Failed:";
   }
 
   function printResults() {
-    var celebration = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
-    var printer = new TestResultsPrinter(results, tests, errors, celebration);
-    printer.printResults();
+    results.printResults(tests);
   }
 
 }
 
-TestResultsPrinter = function(results, tests, errors, celebration) {
+Results = function () {
+  var results = [];
+  var errors = [];
+  var failures = [];
+
+  this.logPass = function() {
+    results.push(".");
+  }
+
+  this.logFailure = function(failure) {
+    results.push("F");
+    failures.push(failure);
+  }
+
+  this.logError = function(error) {
+    results.push("E");
+    errors.push(error);
+  }
+
+  this.printResults = function(tests) {
+    var celebration = "WE DID IT CAP'N!! WE SHIPPED IT!!!";
+    var printer = new TestResultsPrinter(results, tests, errors, failures, celebration);
+    printer.printResults();
+  }
+}
+
+TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   var output = "";
 
   this.printResults = function() {
     logResults();
     logStatistics();
-    logCelebrationIfNeeded();
-    logNewline();
-    logAnyErrors();
+    logCelebrationIfNoErrors();
+    logErrors();
+    logFailures();
     printLog();
   }
 
@@ -309,30 +391,37 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
   }
 
   function logStatistics() {
-    log(tests.length + " tests run, " + errors.length + " failures.");
+    log(numTests() + " tests run, " + numErrors() + " errors, " + numFailures() + " failures.");
   }
 
-  function logAnyErrors() {
-    if(errors.length > 0)
-      logErrors();
+  function logCelebrationIfNoErrors() {
+    if(numErrors() == 0)
+      log(celebration);
+  }
+
+  function numTests() {
+    return tests.length;
+  }
+
+  function numFailures() {
+    return failures.length;
+  }
+
+  function numErrors() {
+    return errors.length;
   }
 
   function logErrors() {
-    for(var i = 0; i < errors.length; i++)
-      logError(i);
+    errors.map(logStack);
   }
 
-  function logError(i) {
-    log(errors[i].stack);
+  function logFailures() {
+    failures.map(logStack);
   }
 
-  function logCelebrationIfNeeded() {
-    if(errors.length <= 0)
-      logCelebration();
-  }
-
-  function logCelebration() {
-    log("WE DID IT CAP'N!! WE SHIPPED IT!!!");
+  function logStack(error) {
+    logNewline();
+    log(error.stack);
   }
 
   function logNewline() {
@@ -348,6 +437,11 @@ TestResultsPrinter = function(results, tests, errors, celebration) {
     console.log(output);
   }
 
+}
+
+// returns any int between and including the arguments.
+function randomIntBetween(lowerBound, upperBound) {
+  return Math.round(Math.random() * (upperBound - lowerBound)) + lowerBound;
 }
 
 new Main().doIt();
