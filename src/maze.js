@@ -5,71 +5,6 @@ NUM_COLUMNS = 10;
 TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
 TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
 
-LineDrawer = function(context) {
-  this.draw = function(xx, yy, numWalls, isVertical, offset) {
-    context.moveTo(xx, yy);
-    var func = function(curCall) {
-      drawWall(xx, yy, offset * curCall, isVertical)
-    }
-    times(numWalls, func);
-  }
-
-  function drawWall(xx, yy, newVal, isVertical) {
-    (isVertical) ? yy = newVal : xx = newVal;
-    context.lineTo(xx, yy);
-  }
-}
-
-VerticalDrawer = function(context) {
-  var lineDrawer = new LineDrawer(context);
-  
-  this.draw = function() {
-    drawMultipleLines(NUM_ROWS + 1, TILE_WIDTH);
-  }
-
-  function drawMultipleLines(numLines, offset) {
-    for (var curLine = 0; curLine < numLines; curLine++)
-      drawLine(offset * curLine);
-  }
-
-  function drawLine(startingX) {
-    lineDrawer.draw(startingX, 0, NUM_ROWS + 1, true, TILE_HEIGHT);
-  }
-}
-
-HorizontalDrawer = function(context) {
-  var lineDrawer = new LineDrawer(context);
-  
-  this.draw = function() {
-    drawMultipleLines(NUM_COLUMNS + 1, TILE_HEIGHT);
-  }
-
-  function drawMultipleLines(numLines, offset) {
-    for (var curLine = 0; curLine < numLines; curLine++)
-      drawLine(offset * curLine);
-  }
-
-  function drawLine(startingY) {
-    lineDrawer.draw(0, startingY, NUM_COLUMNS + 1, false, TILE_WIDTH);
-  }
-}
-
-Drawer = function(context) {
-  this.drawGrid = function() {
-    drawVerticalLines();
-    drawHorizontalLines();
-    context.stroke();
-  }
-
-  function drawVerticalLines() {
-    new VerticalDrawer(context).draw();
-  }
-
-  function drawHorizontalLines() {
-    new HorizontalDrawer(context).draw();
-  }
-}
-
 function times(numCalls, func) {
   for (var curCall = 0; curCall < numCalls; curCall++)
     func(curCall);
@@ -87,6 +22,14 @@ Point = function(x, y) {
     return y;
   }
 
+  this.add = function(pointToAdd) {
+    if(arguments.length === 1)
+      return new Point(arguments[0].getX() + this.getX(), arguments[0].getY() + this.getY());
+    else if(arguments.length === 2)
+      return new Point(arguments[0] + this.getX(), arguments[1] + this.getY());
+    throw new Error("unexpected arguments in Point::add");
+  }
+
   this.toString = function() {
     return "Point ".concat("x: ", x, ", y: ", y);
   }
@@ -95,12 +38,13 @@ Point = function(x, y) {
 
 // 0 = unvisited
 // 1 = visited
-// 2 = dead end
+// 2 = path to dead end
 Maze = function() {
   var maze = [];
   var hWalls = [];
   var vWalls = [];
   var startingPoint;
+  var mazeEdgeDrawer = new MazeEdgeDrawer(addVWallAt, addHWallAt)
 
   this.create = function(start) {
     createRowArrays();
@@ -110,36 +54,39 @@ Maze = function() {
   }
 
   function createRowArrays() {
-    for(var i = 0; i < NUM_ROWS; i++)
-        maze.push([]);
+    times(NUM_ROWS, function() {
+      maze.push([]);
+    });
   }
 
-  function makeAllMazeUnvisited() {
-    for(var i = 0; i < NUM_ROWS; i++)
-      makeAllRowsUnvisited(maze[i]);
+  function makeAllMazeUnvisited() { 
+    times(NUM_ROWS, function(i) {
+      makeAllColumnsUnvisited(maze[i]);
+    });
   }
 
-  function makeAllRowsUnvisited(rows) {
-    for(var i = 0; i < 10; i++)
-      rows.push(0);
+  function makeAllColumnsUnvisited(row) {
+    times(NUM_COLUMNS, function() {
+      row.push(0);
+    });
   }
 
   function generate() {
     var currentPoint = startingPoint;
-    maze[currentPoint.getY()][currentPoint.getX()] = 1;
-    drawWallIfAtMazeEdge(currentPoint);
+    do {
+      process(currentPoint);
+      currentPoint = currentPoint.add(1, 0);
+    } while (currentPoint.getX() < 10)
+    //process(currentPoint);
+  }
+  
+  function process(cell) {
+    setCellVisited(cell);
+    mazeEdgeDrawer.process(cell);
   }
 
-  function drawWallIfAtMazeEdge(currentPoint) {
-    if(currentPoint.getX() == 0)
-      addVWallAt(currentPoint);
-    if(currentPoint.getX() == 9)
-      addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
-
-    if(currentPoint.getY() == 0)
-      addHWallAt(currentPoint);
-    if(currentPoint.getY() == 9)
-      addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
+  function setCellVisited(currentPoint) {
+    maze[currentPoint.getY()][currentPoint.getX()] = 1;
   }
 
   function addVWallAt(currentPoint) {
@@ -188,13 +135,35 @@ Maze = function() {
 
 }
 
+MazeEdgeDrawer = function(addVWallAt, addHWallAt) {
+  this.process = function(currentPoint) {
+    placeVWallIfAtMazeEdge(currentPoint);
+    placeHWallIfAtMazeEdge(currentPoint);
+  }
+  
+  function placeVWallIfAtMazeEdge(currentPoint) {
+    if(currentPoint.getX() == 0)
+      addVWallAt(currentPoint);
+    if(currentPoint.getX() == 9)
+      addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
+  }
+  
+  function placeHWallIfAtMazeEdge(currentPoint) {
+    if(currentPoint.getY() == 0)
+      addHWallAt(currentPoint);
+    if(currentPoint.getY() == 9)
+      addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
+  }
+}
+
 Main = function() {
 
   this.doIt = function() {
     var context = retrieveCanvasContext();
+    var maze = new Maze();
+    maze.create(new Point(0, 0));
+    maze.report();
     fillBackground(context);
-    new Maze().create(new Point(4, 9));
-    new Drawer(context).drawGrid();
   }
 
   function retrieveCanvasContext() {
@@ -220,6 +189,7 @@ Tests = function() {
     add(testPointY);
     add(testPointToString);
     add(testMazeStartingPointCreatesEdgeWall);
+	add(testMazeCreatesWallAboveStart);
     runTestsFromList();
     printResults();
   }
@@ -247,15 +217,25 @@ Tests = function() {
   }
 
   function assertCreatesVWall(startPoint, wallLocation) {
-    var maze = new Maze();
-    maze.create(startPoint);
-    assertPointEquals(wallLocation, maze.getVWalls()[0]);
+    assertCreatesWall(startPoint, wallLocation, "getVWalls");
   }
 
   function assertCreatesHWall(startPoint, wallLocation) {
+    assertCreatesWall(startPoint, wallLocation, "getHWalls");
+  }
+  
+  // WARNING: REFLECTION
+  function assertCreatesWall(startPoint, wallLocation, wallRetriver) {
     var maze = new Maze();
     maze.create(startPoint);
-    assertPointEquals(wallLocation, maze.getHWalls()[0]);
+    assertPointEquals(wallLocation, maze[wallRetriver]()[0]);
+  }
+  
+  function testMazeCreatesWallAboveStart() {
+    var maze = new Maze();
+    var startPoint = new Point(4, 0)
+    maze.create(startPoint);
+    assertPointEquals(new Point(startPoint.getX() + 1, startPoint.getY()), maze.getHWalls()[1]);
   }
 
   function assertPointEquals(expected, actual, message) {
@@ -264,6 +244,7 @@ Tests = function() {
   }
 
   function assertEquals(expected, actual, message) {
+	//if no message was passed in, create one from parameters.
     message = message || "Assertion Failed: ".concat(
       "expected = ", expected,
       ", actual = ", actual,
