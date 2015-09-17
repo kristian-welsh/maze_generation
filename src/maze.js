@@ -197,11 +197,18 @@ Tests = function() {
       testMazeStartingPointAtBottomCreatesBottomEdgeWall,
       testMazeStartingPointAtLeftCreatesLeftEdgeWall,
       testMazeStartingPointAtRightCreatesRightEdgeWall,
-      testMazeCreatesWallAboveStart,
-      testRandomBetween
+      testRandomBetween,
+      testMazeCreatesAllTopWallsWhenStartedAt00
     ]);
     runTestsFromList();
     printResults();
+  }
+  
+  function createMaze(randomFunction = null) {
+    randomFunction = randomFunction || function() {
+      return 0;
+    }
+    return new Maze(randomFunction);
   }
 
   function testPointX() {
@@ -243,6 +250,16 @@ Tests = function() {
     for(var i = 0; i < 100; i++)
       assertRandomBetweenWithinBounds(-i, i);
   }
+  
+  function testMazeCreatesAllTopWallsWhenStartedAt00() {
+    var maze = createMaze();
+    
+    var startPoint = new Point(0, 0);
+    maze.create(startPoint);
+    times(10, function(i) {
+      assertPointEquals(new Point(i, 0), maze.getHWalls()[i]);
+    });
+  }
 
   function assertRandomBetweenWithinBounds(lower, upper) {
     var random = randomIntBetween(lower, upper);
@@ -250,7 +267,7 @@ Tests = function() {
   }
 
   function assertCreatesNoWalls(startPoint) {
-    var maze = new Maze();
+    var maze = createMaze()
     maze.create(startPoint);
     assertEquals(0, maze.getVWalls().length);
     assertEquals(0, maze.getHWalls().length);
@@ -266,18 +283,11 @@ Tests = function() {
   
   // WARNING: REFLECTION
   function assertCreatesWall(startPoint, wallLocation, wallRetriver) {
-    var maze = new Maze();
+    var maze = createMaze();
     maze.create(startPoint);
     assertPointEquals(wallLocation, maze[wallRetriver]()[0]);
   }
   
-  function testMazeCreatesWallAboveStart() {
-    var maze = new Maze();
-    var startPoint = new Point(4, 0)
-    maze.create(startPoint);
-    assertPointEquals(new Point(startPoint.getX() + 1, startPoint.getY()), maze.getHWalls()[1]);
-  }
-
   function assertPointEquals(expected, actual, message) {
     assertNotNull(actual);
     assertEquals(expected.getX(), actual.getX(), message);
