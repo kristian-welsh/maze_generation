@@ -259,7 +259,7 @@ Tests = function() {
   }
 
   function assertPointEquals(expected, actual, message) {
-    assertEquals(expected.getX() + 1, actual.getX(), message);
+    assertEquals(expected.getX(), actual.getX(), message);
     assertEquals(expected.getY(), actual.getY(), message);
   }
 
