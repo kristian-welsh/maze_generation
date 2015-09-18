@@ -14,6 +14,23 @@ function times(numCalls, func) {
     func(curCall);
 }
 
+function argsToArray(args) {
+  return Array.prototype.slice.call(args);
+}
+
+function getFunctionArray(object) {
+  var properties = Object.getOwnPropertyNames(object);
+  var functions = properties.filter(function(p) {
+    return typeof object[p] === 'function';
+  });
+  
+  var results = [];
+  functions.map(function(f) {
+    results.push(object[f]);
+  });
+  return results;
+}
+
 Point = function(x, y) {
   var x = x;
   var y = y;
@@ -192,18 +209,18 @@ Tests = function() {
   var tests = [];
   var assert = new Assertions();
   var results = new Results();
+  var pointTest = new PointTest(assert);
 
   this.runTests = function() {
-    addTestsToList([
-      testPointX,
-      testPointY,
-      testPointToString,
+    addTestSuite(new PointTest(assert));
+    
+    addTests(
       testMazeStartingPointAtTopCreatesTopEdgeWall,
       testMazeStartingPointAtBottomCreatesBottomEdgeWall,
       testMazeStartingPointAtLeftCreatesLeftEdgeWall,
       testMazeStartingPointAtRightCreatesRightEdgeWall,
       testMazeCreatesAllTopWallsWhenStartedAt00
-    ]);
+    );
     runTestsFromList();
     printResults();
   }
@@ -213,21 +230,6 @@ Tests = function() {
       return 0;
     }
     return new Maze(randomFunction);
-  }
-
-  function testPointX() {
-    var point = new Point(5, 0);
-    assert.equals(5, point.getX());
-  }
-
-  function testPointY() {
-    var point = new Point(0, 8);
-    assert.equals(8, point.getY());
-  }
-
-  function testPointToString() {
-    var point = new Point(3, 5);
-    assert.equals("Point x: 3, y: 5", point.toString());
   }
   
   function newMazeWithStart(x, y) {
@@ -266,9 +268,14 @@ Tests = function() {
       assert.pointEquals(new Point(i, 0), maze.getHWalls()[i]);
     });
   }
+  
+  // WARNING: REFLECTION - only define test functions on TestSuites, otherwise this breaks.
+  function addTestSuite(suiteInstance) {
+    getFunctionArray(suiteInstance).map(addTest);
+  }
 
-  function addTestsToList(tests) {
-    tests.map(addTest);
+  function addTests() {
+    argsToArray(arguments).map(addTest);
   }
 
   function addTest(test) {
@@ -301,6 +308,23 @@ Tests = function() {
     results.printResults(tests);
   }
 
+}
+
+PointTest = function(assert) {
+  this.testPointX = function() {
+    var point = new Point(5, 0);
+    assert.equals(5, point.getX());
+  }
+
+  this.testPointY = function() {
+    var point = new Point(0, 8);
+    assert.equals(8, point.getY());
+  }
+
+  this.testPointToString = function() {
+    var point = new Point(3, 5);
+    assert.equals("Point x: 3, y: 5", point.toString());
+  }
 }
 
 Assertions = function() {
