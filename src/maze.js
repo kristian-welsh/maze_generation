@@ -31,6 +31,11 @@ function getFunctionArray(object) {
   return results;
 }
 
+// returns any int between and including the arguments.
+function randomIntBetween(lowerBound, upperBound) {
+  return Math.round(Math.random() * (upperBound - lowerBound)) + lowerBound;
+}
+
 Point = function(x, y) {
   var x = x;
   var y = y;
@@ -209,67 +214,21 @@ Tests = function() {
   var tests = [];
   var assert = new Assertions();
   var results = new Results();
-  var pointTest = new PointTest(assert);
 
   this.runTests = function() {
-    addTestSuite(new PointTest(assert));
-    
-    addTests(
-      testMazeStartingPointAtTopCreatesTopEdgeWall,
-      testMazeStartingPointAtBottomCreatesBottomEdgeWall,
-      testMazeStartingPointAtLeftCreatesLeftEdgeWall,
-      testMazeStartingPointAtRightCreatesRightEdgeWall,
-      testMazeCreatesAllTopWallsWhenStartedAt00
+    addTestSuites(
+      new PointTests(assert),
+      new MazeTests(assert)
     );
     runTestsFromList();
     printResults();
   }
   
-  function createMaze(randomFunction) {
-    randomFunction = randomFunction || function() {
-      return 0;
-    }
-    return new Maze(randomFunction);
+  function addTestSuites() {
+    argsToArray(arguments).map(addTestSuite);
   }
   
-  function newMazeWithStart(x, y) {
-    var maze = createMaze();
-    var startingPoint = new Point(x, y);
-    maze.create(startingPoint)
-    return maze;
-  }
-
-  function testMazeStartingPointAtTopCreatesTopEdgeWall() {
-    assert.createsHWall(new Point(0, 0), newMazeWithStart(0, 0));
-    assert.createsHWall(new Point(9, 0), newMazeWithStart(9, 0));
-  }
-
-  function testMazeStartingPointAtBottomCreatesBottomEdgeWall() {
-    assert.createsHWall(new Point(0, 10), newMazeWithStart(0, 9));
-    assert.createsHWall(new Point(9, 10), newMazeWithStart(9, 9));
-  }
-
-  function testMazeStartingPointAtLeftCreatesLeftEdgeWall() {
-    assert.createsVWall(new Point(0, 0), newMazeWithStart(0, 0));
-    assert.createsVWall(new Point(0, 9), newMazeWithStart(0, 9));
-  }
-
-  function testMazeStartingPointAtRightCreatesRightEdgeWall() {
-    assert.createsVWall(new Point(10, 0), newMazeWithStart(9, 0));
-    assert.createsVWall(new Point(10, 9), newMazeWithStart(9, 9));
-  }
-  
-  function testMazeCreatesAllTopWallsWhenStartedAt00() {
-    var maze = createMaze();
-    
-    var startPoint = new Point(0, 0);
-    maze.create(startPoint);
-    times(10, function(i) {
-      assert.pointEquals(new Point(i, 0), maze.getHWalls()[i]);
-    });
-  }
-  
-  // WARNING: REFLECTION - only define test functions on TestSuites, otherwise this breaks.
+  // WARNING: REFLECTION - Assumes all public methods are tests.
   function addTestSuite(suiteInstance) {
     getFunctionArray(suiteInstance).map(addTest);
   }
@@ -307,10 +266,9 @@ Tests = function() {
   function printResults() {
     results.printResults(tests);
   }
-
 }
 
-PointTest = function(assert) {
+PointTests = function(assert) {
   this.testPointX = function() {
     var point = new Point(5, 0);
     assert.equals(5, point.getX());
@@ -324,6 +282,52 @@ PointTest = function(assert) {
   this.testPointToString = function() {
     var point = new Point(3, 5);
     assert.equals("Point x: 3, y: 5", point.toString());
+  }
+}
+
+MazeTests = function(assert) {
+  this.testMazeStartingPointAtTopCreatesTopEdgeWall = function() {
+    assert.createsHWall(new Point(0, 0), newMazeWithStart(0, 0));
+    assert.createsHWall(new Point(9, 0), newMazeWithStart(9, 0));
+  }
+
+  this.testMazeStartingPointAtBottomCreatesBottomEdgeWall = function() {
+    assert.createsHWall(new Point(0, 10), newMazeWithStart(0, 9));
+    assert.createsHWall(new Point(9, 10), newMazeWithStart(9, 9));
+  }
+
+  this.testMazeStartingPointAtLeftCreatesLeftEdgeWall = function() {
+    assert.createsVWall(new Point(0, 0), newMazeWithStart(0, 0));
+    assert.createsVWall(new Point(0, 9), newMazeWithStart(0, 9));
+  }
+
+  this.testMazeStartingPointAtRightCreatesRightEdgeWall = function() {
+    assert.createsVWall(new Point(10, 0), newMazeWithStart(9, 0));
+    assert.createsVWall(new Point(10, 9), newMazeWithStart(9, 9));
+  }
+
+  this.testMazeCreatesAllTopWallsWhenStartedAt00 = function() {
+    var maze = createMaze();
+    
+    var startPoint = new Point(0, 0);
+    maze.create(startPoint);
+    times(10, function(i) {
+      assert.pointEquals(new Point(i, 0), maze.getHWalls()[i]);
+    });
+  }
+
+  function newMazeWithStart(x, y) {
+    var maze = createMaze();
+    var startingPoint = new Point(x, y);
+    maze.create(startingPoint)
+    return maze;
+  }
+
+  function createMaze(randomFunction) {
+    randomFunction = randomFunction || function() {
+      return 0;
+    }
+    return new Maze(randomFunction);
   }
 }
 
@@ -467,12 +471,6 @@ TestResultsPrinter = function(results, tests, errors, failures, celebration) {
   function printLog() {
     console.log(output);
   }
-
-}
-
-// returns any int between and including the arguments.
-function randomIntBetween(lowerBound, upperBound) {
-  return Math.round(Math.random() * (upperBound - lowerBound)) + lowerBound;
 }
 
 new Main().doIt();
