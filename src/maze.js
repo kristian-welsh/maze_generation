@@ -5,6 +5,10 @@ NUM_COLUMNS = 10;
 TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
 TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
 
+function fail(message) {
+ throw new Error(message);
+}
+
 function times(numCalls, func) {
   for (var curCall = 0; curCall < numCalls; curCall++)
     func(curCall);
@@ -43,7 +47,7 @@ Point = function(x, y) {
 // 0 = unvisited
 // 1 = visited
 // 2 = path to dead end
-Maze = function() {
+Maze = function(randomFunction) {
   var maze = [];
   var hWalls = [];
   var vWalls = [];
@@ -186,6 +190,7 @@ Main = function() {
 // I  would also like to test MazeEdgeDrawer seperately from MazeCreator.
 Tests = function() {
   var tests = [];
+  var assert = new Assertions();
   var results = new Results();
 
   this.runTests = function() {
@@ -197,14 +202,13 @@ Tests = function() {
       testMazeStartingPointAtBottomCreatesBottomEdgeWall,
       testMazeStartingPointAtLeftCreatesLeftEdgeWall,
       testMazeStartingPointAtRightCreatesRightEdgeWall,
-      testRandomBetween,
       testMazeCreatesAllTopWallsWhenStartedAt00
     ]);
     runTestsFromList();
     printResults();
   }
   
-  function createMaze(randomFunction = null) {
+  function createMaze(randomFunction) {
     randomFunction = randomFunction || function() {
       return 0;
     }
@@ -213,42 +217,44 @@ Tests = function() {
 
   function testPointX() {
     var point = new Point(5, 0);
-    assertEquals(5, point.getX());
+    assert.equals(5, point.getX());
   }
 
   function testPointY() {
     var point = new Point(0, 8);
-    assertEquals(8, point.getY());
+    assert.equals(8, point.getY());
   }
 
   function testPointToString() {
     var point = new Point(3, 5);
-    assertEquals("Point x: 3, y: 5", point.toString());
+    assert.equals("Point x: 3, y: 5", point.toString());
+  }
+  
+  function newMazeWithStart(x, y) {
+    var maze = createMaze();
+    var startingPoint = new Point(x, y);
+    maze.create(startingPoint)
+    return maze;
   }
 
   function testMazeStartingPointAtTopCreatesTopEdgeWall() {
-    assertCreatesHWall(new Point(0, 0), new Point(0, 0));
-    assertCreatesHWall(new Point(9, 0), new Point(9, 0));
+    assert.createsHWall(new Point(0, 0), newMazeWithStart(0, 0));
+    assert.createsHWall(new Point(9, 0), newMazeWithStart(9, 0));
   }
 
   function testMazeStartingPointAtBottomCreatesBottomEdgeWall() {
-    assertCreatesHWall(new Point(0, 9), new Point(0, 10));
-    assertCreatesHWall(new Point(9, 9), new Point(9, 10));
+    assert.createsHWall(new Point(0, 10), newMazeWithStart(0, 9));
+    assert.createsHWall(new Point(9, 10), newMazeWithStart(9, 9));
   }
 
   function testMazeStartingPointAtLeftCreatesLeftEdgeWall() {
-    assertCreatesVWall(new Point(0, 0), new Point(0, 0));
-    assertCreatesVWall(new Point(0, 9), new Point(0, 9));
+    assert.createsVWall(new Point(0, 0), newMazeWithStart(0, 0));
+    assert.createsVWall(new Point(0, 9), newMazeWithStart(0, 9));
   }
 
   function testMazeStartingPointAtRightCreatesRightEdgeWall() {
-    assertCreatesVWall(new Point(9, 0), new Point(10, 0));
-    assertCreatesVWall(new Point(9, 9), new Point(10, 9));
-  }
-
-  function testRandomBetween() {
-    for(var i = 0; i < 100; i++)
-      assertRandomBetweenWithinBounds(-i, i);
+    assert.createsVWall(new Point(10, 0), newMazeWithStart(9, 0));
+    assert.createsVWall(new Point(10, 9), newMazeWithStart(9, 9));
   }
   
   function testMazeCreatesAllTopWallsWhenStartedAt00() {
@@ -257,69 +263,8 @@ Tests = function() {
     var startPoint = new Point(0, 0);
     maze.create(startPoint);
     times(10, function(i) {
-      assertPointEquals(new Point(i, 0), maze.getHWalls()[i]);
+      assert.pointEquals(new Point(i, 0), maze.getHWalls()[i]);
     });
-  }
-
-  function assertRandomBetweenWithinBounds(lower, upper) {
-    var random = randomIntBetween(lower, upper);
-    assertTrue(lower <= random && random <= upper);
-  }
-
-  function assertCreatesNoWalls(startPoint) {
-    var maze = createMaze()
-    maze.create(startPoint);
-    assertEquals(0, maze.getVWalls().length);
-    assertEquals(0, maze.getHWalls().length);
-  }
-
-  function assertCreatesVWall(startPoint, wallLocation) {
-    assertCreatesWall(startPoint, wallLocation, "getVWalls");
-  }
-
-  function assertCreatesHWall(startPoint, wallLocation) {
-    assertCreatesWall(startPoint, wallLocation, "getHWalls");
-  }
-  
-  // WARNING: REFLECTION
-  function assertCreatesWall(startPoint, wallLocation, wallRetriver) {
-    var maze = createMaze();
-    maze.create(startPoint);
-    assertPointEquals(wallLocation, maze[wallRetriver]()[0]);
-  }
-  
-  function assertPointEquals(expected, actual, message) {
-    assertNotNull(actual);
-    assertEquals(expected.getX(), actual.getX(), message);
-    assertEquals(expected.getY(), actual.getY(), message);
-  }
-
-  function assertEquals(expected, actual, message) {
-    //if no message was passed in, create one from parameters.
-    message = message || "Assertion Failed: ".concat(
-      "expected = ", expected,
-      ", actual = ", actual,
-      ". ", message);
-    if(expected !== actual)
-      fail(message);
-  }
-
-  function assertNotNull(actual, message) {
-    message = "Assertion Failed: ".concat(
-      "Expected argument to not be null. ", message);
-    if(!actual)
-      fail(message);
-  }
-
-  function assertTrue(condition, message) {
-    message = "Assertion Failed: ".concat(
-      "Expected argument to be true. ", message);
-    if(!condition)
-      fail(message);
-  }
-
-  function fail(message) {
-    throw new Error(message);
   }
 
   function addTestsToList(tests) {
@@ -356,6 +301,58 @@ Tests = function() {
     results.printResults(tests);
   }
 
+}
+
+Assertions = function() {
+  this.createsNoWalls = function(startPoint) {
+    var maze = createMaze()
+    maze.create(startPoint);
+    equals(0, maze.getVWalls().length);
+    equals(0, maze.getHWalls().length);
+  }
+
+  this.createsVWall = function(wallLocation, maze) {
+    this.createsWall(wallLocation, "getVWalls", maze);
+  }
+
+  this.createsHWall = function(wallLocation, maze) {
+    this.createsWall(wallLocation, "getHWalls", maze);
+  }
+  
+  // WARNING: REFLECTION
+  this.createsWall = function(wallLocation, wallRetriver, maze) {
+    this.pointEquals(wallLocation, maze[wallRetriver]()[0]);
+  }
+  
+  this.pointEquals = function(expected, actual, message) {
+    this.notNull(actual);
+    this.equals(expected.getX(), actual.getX(), message);
+    this.equals(expected.getY(), actual.getY(), message);
+  }
+
+  this.equals = function(expected, actual, message) {
+    //if no message was passed in, create one from parameters.
+    message = message || "Assertion Failed: ".concat(
+      "expected = ", expected,
+      ", actual = ", actual,
+      ". ", message);
+    if(expected !== actual)
+      fail(message);
+  }
+
+  this.notNull = function(actual, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to not be null. ", message);
+    if(!actual)
+      fail(message);
+  }
+
+  this.true = function(condition, message) {
+    message = "Assertion Failed: ".concat(
+      "Expected argument to be true. ", message);
+    if(!condition)
+      fail(message);
+  }
 }
 
 Results = function () {
