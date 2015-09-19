@@ -1,43 +1,19 @@
 define(function(require) {
+  times = require("lib/kris/times.js");
+  fail = require("lib/kris/fail.js");
+  argsToArray = require("lib/kris/argsToArray.js");
+  getFunctionArray = require("lib/kris/getFunctionArray.js");
+  randomIntBetween = require("lib/kris/randomIntBetween.js");
+  
+  Point = require("./Point.js");
+  MazeEdgeDrawer = require("./MazeEdgeDrawer.js");
+  
   CANVAS_WIDTH = 400;
   CANVAS_HEIGHT = 400;
   NUM_ROWS = 10;
   NUM_COLUMNS = 10;
   TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
   TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
-
-  function fail(message) {
-   throw new Error(message);
-  }
-
-  function times(numCalls, func) {
-    for (var curCall = 0; curCall < numCalls; curCall++)
-      func(curCall);
-  }
-
-  function argsToArray(args) {
-    return Array.prototype.slice.call(args);
-  }
-
-  function getFunctionArray(object) {
-    var properties = Object.getOwnPropertyNames(object);
-    var functions = properties.filter(function(p) {
-      return typeof object[p] === 'function';
-    });
-    
-    var results = [];
-    functions.map(function(f) {
-      results.push(object[f]);
-    });
-    return results;
-  }
-
-  // returns any int between and including the arguments.
-  function randomIntBetween(lowerBound, upperBound) {
-    return Math.round(Math.random() * (upperBound - lowerBound)) + lowerBound;
-  }
-
-  Point = require("./Point.js");
 
   // 0 = unvisited
   // 1 = visited
@@ -136,27 +112,6 @@ define(function(require) {
       return vWalls;
     }
 
-  }
-
-  MazeEdgeDrawer = function(addVWallAt, addHWallAt) {
-    this.process = function(currentPoint) {
-      placeVWallIfAtMazeEdge(currentPoint);
-      placeHWallIfAtMazeEdge(currentPoint);
-    }
-    
-    function placeVWallIfAtMazeEdge(currentPoint) {
-      if(currentPoint.getX() == 0)
-        addVWallAt(currentPoint);
-      if(currentPoint.getX() == 9)
-        addVWallAt(new Point(currentPoint.getX() + 1, currentPoint.getY()));
-    }
-    
-    function placeHWallIfAtMazeEdge(currentPoint) {
-      if(currentPoint.getY() == 0)
-        addHWallAt(currentPoint);
-      if(currentPoint.getY() == 9)
-        addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
-    }
   }
 
   Main = function() {
