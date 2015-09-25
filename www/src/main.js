@@ -2,17 +2,19 @@ define(function(require) {
   argsToArray = require("lib/kris/argsToArray.js");
   getFunctionArray = require("lib/kris/getFunctionArray.js");
   
-  TestRunner = require("kris/test/TestRunner");
-  
   Point = require("./Point");
   Maze = require("./Maze");
+  
+  TestRunner = require("kris/test/TestRunner");
+
   MazeTests = require("./MazeTests");
   PointTests = require("./PointTests");
+  MazeEdgeDrawerTest = require("./MazeEdgeDrawerTest.js");
 
   Main = function() {
     this.doIt = function() {
       var context = retrieveCanvasContext();
-      var maze = new Maze();
+      var maze = new Maze(null, new MazeEdgeDrawer());
       maze.create(new Point(0, 0));
       maze.report();
       fillBackground(context);
@@ -30,5 +32,5 @@ define(function(require) {
   }
 
   new Main().doIt();
-  new TestRunner().runTests(PointTests, MazeTests);
+  new TestRunner().runTests(PointTests, MazeTests, MazeEdgeDrawerTest);
 });

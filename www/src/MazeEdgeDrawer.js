@@ -1,5 +1,16 @@
 define(function(require) {
-  MazeEdgeDrawer = function(addVWallAt, addHWallAt) {
+  return function() {
+    var addVWallAt;
+    var addHWallAt;
+    
+    this.setVWallCallback = function(callback) {
+      addVWallAt = callback;
+    }
+    
+    this.setHWallCallback = function(callback) {
+      addHWallAt = callback;
+    }
+    
     this.process = function(currentPoint) {
       placeVWallIfAtMazeEdge(currentPoint);
       placeHWallIfAtMazeEdge(currentPoint);
@@ -19,5 +30,4 @@ define(function(require) {
         addHWallAt(new Point(currentPoint.getX(), currentPoint.getY() + 1));
     }
   }
-  return MazeEdgeDrawer;
 });

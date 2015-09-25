@@ -3,3 +3,7 @@ find a way to get rid of all the "this."s in the Assertions class
 change "10 tests run, 2 failed, 1 error" to "10 tests run\n7 passed, 2 failed, 1 error"
 Test MazeEdgeDrawer seperately from Maze.
 Redistrebute the require lines to their correct files.
+Typecheck all parameters and throww custom errors.
+Test MazeEdgeDrawer Seperately from maze.
+Change test system so that a new instance is created for each test run
+bug fix: success message is printed even though i had a failing test.

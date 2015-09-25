@@ -12,12 +12,14 @@ define(function(require) {
   // 0 = unvisited
   // 1 = visited
   // 2 = path to dead end
-  Maze = function(randomFunction) {
+  Maze = function(randomFunction, edgeDrawer) {
     var maze = [];
     var hWalls = [];
     var vWalls = [];
     var startingPoint;
-    var mazeEdgeDrawer = new MazeEdgeDrawer(addVWallAt, addHWallAt)
+    var mazeEdgeDrawer = edgeDrawer || new MazeEdgeDrawer();
+    mazeEdgeDrawer.setVWallCallback(addVWallAt);
+    mazeEdgeDrawer.setHWallCallback(addHWallAt);
 
     this.create = function(start) {
       createRowArrays();

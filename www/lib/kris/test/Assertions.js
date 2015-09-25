@@ -1,6 +1,6 @@
 define(function(require) {
-  require("lib/kris/fail.js");
-  Assertions = function() {
+  fail = require("lib/kris/fail.js");
+  return function() {
     this.createsNoWalls = function(startPoint) {
       var maze = createMaze()
       maze.create(startPoint);
@@ -51,5 +51,4 @@ define(function(require) {
         fail(message);
     }
   }
-  return Assertions;
 });
