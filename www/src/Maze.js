@@ -1,4 +1,5 @@
 define(function(require) {
+  times = require("lib/kris/times.js");
   MazeEdgeDrawer = require("./MazeEdgeDrawer.js");
   
   CANVAS_WIDTH = 400;

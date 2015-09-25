@@ -1,15 +1,11 @@
 define(function(require) {
-  times = require("lib/kris/times.js");
   argsToArray = require("lib/kris/argsToArray.js");
   getFunctionArray = require("lib/kris/getFunctionArray.js");
-  randomIntBetween = require("lib/kris/randomIntBetween.js");
+  
+  TestRunner = require("kris/test/TestRunner");
   
   Point = require("./Point");
   Maze = require("./Maze");
-  Assertions = require("./Assertions");
-  TestRunner = require("./TestRunner");
-  Results = require("./results");
-  TestResultsPrinter = require("./TestResultsPrinter");
   MazeTests = require("./MazeTests");
   PointTests = require("./PointTests");
 

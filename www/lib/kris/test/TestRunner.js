@@ -1,4 +1,8 @@
 define(function(require) {
+  Results = require("kris/test/Results");
+  TestResultsPrinter = require("kris/test/TestResultsPrinter");
+  Assertions = require("kris/test/Assertions");
+  
   // I  would like to test MazeEdgeDrawer seperately from MazeCreator.
   TestRunner = function() {
     var tests = [];

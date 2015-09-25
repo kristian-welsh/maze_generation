@@ -1,4 +1,5 @@
 define(function(require) {
+  times = require("lib/kris/times.js");
   
   MazeTests = function(assert) {
     this.testMazeStartingPointAtTopCreatesTopEdgeWall = function() {
