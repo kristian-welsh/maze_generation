@@ -1,6 +1,7 @@
 define(function(require) {
   times = require("lib/kris/times.js");
-  MazeEdgeDrawer = require("./MazeEdgeDrawer.js");
+  MazeEdgeDrawer = require("./edge/MazeEdgeDrawer.js");
+  Random = require("../random/Random");
   
   CANVAS_WIDTH = 400;
   CANVAS_HEIGHT = 400;
@@ -12,7 +13,7 @@ define(function(require) {
   // 0 = unvisited
   // 1 = visited
   // 2 = path to dead end
-  Maze = function(randomFunction, edgeDrawer) {
+  Maze = function(randomGenerator, edgeDrawer) {
     var maze = [];
     var hWalls = [];
     var vWalls = [];
@@ -20,6 +21,7 @@ define(function(require) {
     var mazeEdgeDrawer = edgeDrawer || new MazeEdgeDrawer();
     mazeEdgeDrawer.setVWallCallback(addVWallAt);
     mazeEdgeDrawer.setHWallCallback(addHWallAt);
+    randomGenerator = randomGenerator || new Random();
 
     this.create = function(start) {
       createRowArrays();
@@ -48,16 +50,54 @@ define(function(require) {
 
     function generate() {
       var currentPoint = startingPoint;
-      do {
+      var direction = new Point(0, 0);
+      var directionResults = [];
+      for(i = 0; i < 55; i++) {
+        var directions = getAllowedDirections(currentPoint)
+        if(directions.length > 0) {
+          direction = randomGenerator.randomElement(directions);
+        }
+        directionResults.push(direction);
         process(currentPoint);
-        currentPoint = currentPoint.add(1, 0);
-      } while (currentPoint.getX() < 10)
-      //process(currentPoint);
+        currentPoint = currentPoint.add(direction);
+      }
+      alert(directionResults);
+    }
+  
+    function getAllowedDirections(currentPoint) {
+      var returnMe = [];
+      if(getCellAt(currentPoint.add(1, 0)) == 0) {
+        returnMe.push(new Point(1, 0));
+      }
+      if(getCellAt(currentPoint.add(-1, 0)) == 0) {
+        returnMe.push(new Point(-1, 0));
+      }
+      if(getCellAt(currentPoint.add(0, 1)) == 0) {
+        returnMe.push(new Point(0, 1));
+      }
+      if(getCellAt(currentPoint.add(0, -1)) == 0) {
+        returnMe.push(new Point(0, -1));
+      }
+      return returnMe;
+    }
+  
+    function randomElement(array) {
+      return array[randomFunction(0, array.length - 1)];
+    }
+  
+    function shouldStopGenerating(currentPoint) {
+      return currentPoint.getX() >= 10;
     }
     
     function process(cell) {
       setCellVisited(cell);
       mazeEdgeDrawer.process(cell);
+    }
+
+    function getCellAt(point) {
+      if(point.getY() < 0 || point.getX() < 0 || point.getX() >= 10 || point.getY() >= 10)
+        return -1;
+      return maze[point.getY()][point.getX()];
     }
 
     function setCellVisited(currentPoint) {

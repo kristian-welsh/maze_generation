@@ -2,14 +2,16 @@ define(function(require) {
   argsToArray = require("lib/kris/argsToArray.js");
   getFunctionArray = require("lib/kris/getFunctionArray.js");
   
-  Point = require("./Point");
-  Maze = require("./Maze");
+  Point = require("./point/Point");
+  Maze = require("./maze/Maze");
   
   TestRunner = require("kris/test/TestRunner");
 
-  MazeTests = require("./MazeTests");
-  PointTests = require("./PointTests");
-  MazeEdgeDrawerTest = require("./MazeEdgeDrawerTest.js");
+  MazeTests = require("./maze/MazeTests");
+  PointTests = require("./point/PointTests");
+  MazeEdgeDrawerTest = require("./maze/edge/MazeEdgeDrawerTest.js");
+  
+  Random = require("./random/Random");
 
   Main = function() {
     this.doIt = function() {
