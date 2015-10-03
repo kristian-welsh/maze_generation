@@ -51,19 +51,17 @@ define(function(require) {
     function generate() {
       var currentPoint = startingPoint;
       var direction = new Point(0, 0);
-      var directionResults = [];
       for(i = 0; i < 55; i++) {
         var directions = getAllowedDirections(currentPoint)
-        if(directions.length > 0) {
-          direction = randomGenerator.randomElement(directions);
+        if(directions.length <= 0) {
+          break;
         }
-        directionResults.push(direction);
+        direction = randomGenerator.randomElement(directions);
         process(currentPoint);
         currentPoint = currentPoint.add(direction);
       }
-      alert(directionResults);
     }
-  
+
     function getAllowedDirections(currentPoint) {
       var returnMe = [];
       if(getCellAt(currentPoint.add(1, 0)) == 0) {
@@ -80,15 +78,15 @@ define(function(require) {
       }
       return returnMe;
     }
-  
+
     function randomElement(array) {
       return array[randomFunction(0, array.length - 1)];
     }
-  
+
     function shouldStopGenerating(currentPoint) {
       return currentPoint.getX() >= 10;
     }
-    
+
     function process(cell) {
       setCellVisited(cell);
       mazeEdgeDrawer.process(cell);
