@@ -1,7 +1,9 @@
 define(function(require) {
   times = require("lib/kris/times.js");
   MazeEdgeDrawer = require("./edge/MazeEdgeDrawer.js");
+  MazeJoinDrawer = require("./join/MazeJoinDrawer.js");
   Random = require("../random/Random");
+  Drawer = require ("../Drawer");
   
   CANVAS_WIDTH = 400;
   CANVAS_HEIGHT = 400;
@@ -12,15 +14,20 @@ define(function(require) {
   
   // 0 = unvisited
   // 1 = visited
-  // 2 = path to dead end
-  Maze = function(randomGenerator, edgeDrawer) {
+  // Should seperate maze data object from wall placement functions
+  Maze = function(randomGenerator, edgeDrawer, graphicDrawer, joinDrawer) {
     var maze = [];
     var hWalls = [];
     var vWalls = [];
+    var jumps = [];
     var startingPoint;
+    var graphicDrawer = graphicDrawer;
     var mazeEdgeDrawer = edgeDrawer || new MazeEdgeDrawer();
+    var mazeJoinDrawer = joinDrawer || new MazeJoinDrawer();
     mazeEdgeDrawer.setVWallCallback(addVWallAt);
     mazeEdgeDrawer.setHWallCallback(addHWallAt);
+    mazeJoinDrawer.setVWallCallback(addVWallAt);
+    mazeJoinDrawer.setHWallCallback(addHWallAt);
     randomGenerator = randomGenerator || new Random();
 
     this.create = function(start) {
@@ -28,6 +35,12 @@ define(function(require) {
       makeAllMazeUnvisited();
       startingPoint = start;
       generate();
+      for(var i = 0; i < hWalls.length; i++) {
+        graphicDrawer.drawHWallAt(hWalls[i]);
+      }
+      for(i = 0; i < vWalls.length; i++) {
+        graphicDrawer.drawVWallAt(vWalls[i]);
+      }
     }
 
     function createRowArrays() {
@@ -49,19 +62,20 @@ define(function(require) {
     }
 
     function generate() {
+      var previousPoint = null;
       var currentPoint = startingPoint;
+      var validDirections = [];
       var direction = new Point(0, 0);
-      for(i = 0; i < 55; i++) {
-        var directions = getAllowedDirections(currentPoint)
-        if(directions.length <= 0) {
-          break;
-        }
-        direction = randomGenerator.randomElement(directions);
-        process(currentPoint);
-        currentPoint = currentPoint.add(direction);
+      for(i = 0; i < maze.length * maze[0].length; i++) {
+        process(currentPoint, previousPoint);
+        validDirections = getAllowedDirections(currentPoint);
+        direction = randomGenerator.randomElement(validDirections);
+        previousPoint = currentPoint;
+        currentPoint = (direction ? currentPoint.add(direction) : getUnprocesedCell(currentPoint));
       }
     }
 
+    // inverse functions as wall detection
     function getAllowedDirections(currentPoint) {
       var returnMe = [];
       if(getCellAt(currentPoint.add(1, 0)) == 0) {
@@ -87,9 +101,10 @@ define(function(require) {
       return currentPoint.getX() >= 10;
     }
 
-    function process(cell) {
+    function process(cell, prevCell) {
       setCellVisited(cell);
       mazeEdgeDrawer.process(cell);
+      mazeJoinDrawer.process(cell, prevCell, maze)
     }
 
     function getCellAt(point) {
@@ -109,24 +124,20 @@ define(function(require) {
     function addHWallAt(currentPoint) {
       hWalls.push(currentPoint);
     }
-
-    this.report = function() {
-      reportMaze();
-      reportWalls();
+    
+    function getUnprocesedCell(currentPoint) {
+      for(var y = 0; y < maze.length; y++) {
+        for(var x = 0; x < maze[y].length; x++) {
+          if(maze[y][x] === 0) {
+            console.log("Start: x: " + currentPoint.getX() + ", y:" + currentPoint.getY()+ "\nNew Point: x: " + x + ", y: " + y + "\n");
+            return new Point(x, y);
+          }
+        }
+      }
     }
 
-    function reportMaze() {
-      alert("" + 
-        maze[0].join(" ") + "\n" +
-        maze[1].join(" ") + "\n" +
-        maze[2].join(" ") + "\n" +
-        maze[3].join(" ") + "\n" +
-        maze[4].join(" ") + "\n" +
-        maze[5].join(" ") + "\n" +
-        maze[6].join(" ") + "\n" +
-        maze[7].join(" ") + "\n" +
-        maze[8].join(" ") + "\n" +
-        maze[9].join(" "));
+    this.report = function() {
+      reportWalls();
     }
 
     function reportWalls() {

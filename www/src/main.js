@@ -13,13 +13,19 @@ define(function(require) {
   
   Random = require("./random/Random");
 
+  Drawer = require("./Drawer");
+
   Main = function() {
     this.doIt = function() {
       var context = retrieveCanvasContext();
-      var maze = new Maze(null, new MazeEdgeDrawer());
+      var drawer = new Drawer(context);
+      var maze = new Maze(new Random(), new MazeEdgeDrawer(), drawer);
+      context.beginPath();
       maze.create(new Point(0, 0));
       maze.report();
       fillBackground(context);
+      context.stroke();
+      
     }
 
     function retrieveCanvasContext() {

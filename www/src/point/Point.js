@@ -22,6 +22,10 @@ define(function(require) {
         return new Point(arguments[0] + this.getX(), arguments[1] + this.getY());
       throw new Error("unexpected arguments in Point::add");
     }
+    
+    this.equals = function(pointToCompare) {
+      return x === pointToCompare.getX() && y === pointToCompare.getY();
+    }
 
     this.toString = function() {
       return "Point ".concat("x: ", x, ", y: ", y);
