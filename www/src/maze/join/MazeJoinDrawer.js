@@ -1,4 +1,5 @@
 define(function(require) {
+  
   return function() {
     var addVWallAt;
     var addHWallAt;
@@ -35,7 +36,7 @@ define(function(require) {
     }
     
     function getCellAt(point, maze) {
-      if(point.getY() < 0 || point.getX() < 0 || point.getX() >= 10 || point.getY() >= 10)
+      if(point.getY() < 0 || point.getX() < 0 || point.getX() >= NUM_COLUMNS || point.getY() >= NUM_ROWS)
         return -1;
       return maze[point.getY()][point.getX()];
     }

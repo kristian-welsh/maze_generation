@@ -14,6 +14,15 @@ define(function(require) {
   Random = require("./random/Random");
 
   Drawer = require("./Drawer");
+  
+  EDGE_PADDING = 10;
+  CANVAS_WIDTH = 500;
+  CANVAS_HEIGHT = 500;
+  NUM_ROWS = 250;
+  NUM_COLUMNS = 250;
+  TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
+  TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
+  WALL_DEPTH = 1;
 
   Main = function() {
     this.doIt = function() {
@@ -21,11 +30,10 @@ define(function(require) {
       var drawer = new Drawer(context);
       var maze = new Maze(new Random(), new MazeEdgeDrawer(), drawer);
       context.beginPath();
-      maze.create(new Point(0, 0));
-      maze.report();
       fillBackground(context);
+      context.lineWidth = WALL_DEPTH;
+      maze.create(new Point(0, 0));
       context.stroke();
-      
     }
 
     function retrieveCanvasContext() {
@@ -35,7 +43,7 @@ define(function(require) {
 
     function fillBackground(context) {
       context.fillStyle = "#DDDDDD";
-      context.fillRect(0, 0, 400, 400);
+      context.fillRect(EDGE_PADDING, EDGE_PADDING, EDGE_PADDING + CANVAS_WIDTH - TILE_WIDTH, EDGE_PADDING + CANVAS_HEIGHT - TILE_HEIGHT);
     }
   }
 

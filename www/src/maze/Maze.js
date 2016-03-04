@@ -5,13 +5,6 @@ define(function(require) {
   Random = require("../random/Random");
   Drawer = require ("../Drawer");
   
-  CANVAS_WIDTH = 400;
-  CANVAS_HEIGHT = 400;
-  NUM_ROWS = 10;
-  NUM_COLUMNS = 10;
-  TILE_WIDTH = CANVAS_WIDTH / NUM_ROWS;
-  TILE_HEIGHT = CANVAS_HEIGHT / NUM_COLUMNS;
-  
   // 0 = unvisited
   // 1 = visited
   // Should seperate maze data object from wall placement functions
@@ -67,6 +60,10 @@ define(function(require) {
       var validDirections = [];
       var direction = new Point(0, 0);
       for(i = 0; i < maze.length * maze[0].length; i++) {
+        if(!direction) {
+          // if processing jumped to this position, pick a direction to not draw a wall in.
+          previousPoint = currentPoint.add(getSingleDisallowedDirection(currentPoint));
+        }
         process(currentPoint, previousPoint);
         validDirections = getAllowedDirections(currentPoint);
         direction = randomGenerator.randomElement(validDirections);
@@ -93,12 +90,32 @@ define(function(require) {
       return returnMe;
     }
 
+    // duplicated in getAllowedDirection() and MazeJoinDrawer.js
+    function getSingleDisallowedDirection(currentPoint) {
+      var returnMe = [];
+      var allowed = getAllowedDirections(currentPoint);
+      if(allowed.indexOf())
+      if(getCellAt(currentPoint.add(1, 0)) == 1) {
+        return new Point(1, 0);
+      }
+      if(getCellAt(currentPoint.add(-1, 0)) == 1) {
+        return new Point(-1, 0);
+      }
+      if(getCellAt(currentPoint.add(0, 1)) == 1) {
+        return new Point(0, 1);
+      }
+      if(getCellAt(currentPoint.add(0, -1)) == 1) {
+        return new Point(0, -1);
+      }
+      throw ":( no disallowed direction, it jumped to an isolated cell"
+    }
+
     function randomElement(array) {
       return array[randomFunction(0, array.length - 1)];
     }
 
     function shouldStopGenerating(currentPoint) {
-      return currentPoint.getX() >= 10;
+      return currentPoint.getX() >= NUM_COLUMNS;
     }
 
     function process(cell, prevCell) {
@@ -108,7 +125,7 @@ define(function(require) {
     }
 
     function getCellAt(point) {
-      if(point.getY() < 0 || point.getX() < 0 || point.getX() >= 10 || point.getY() >= 10)
+      if(point.getY() < 0 || point.getX() < 0 || point.getX() >= NUM_COLUMNS || point.getY() >= NUM_ROWS)
         return -1;
       return maze[point.getY()][point.getX()];
     }
@@ -134,19 +151,6 @@ define(function(require) {
           }
         }
       }
-    }
-
-    this.report = function() {
-      reportWalls();
-    }
-
-    function reportWalls() {
-      alert("" + 
-        "H walls\n\n" + 
-        hWalls.join("\n") +
-        "\n\n" +
-        "V walls\n\n" +
-        vWalls.join("\n"));
     }
 
     this.getHWalls = function() {
